@@ -57,7 +57,7 @@ export function EditNotificationModal({
     },
   })
 
-  const onSubmit = (data: NotificationFormData) => {
+  const onSubmit = (data: any) => {
     updateNotification(
       { id: notification.id, data },
       {

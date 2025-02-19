@@ -1,4 +1,4 @@
-import { Notification } from "@/components/notifications/columns"
+import { type Notification } from "@/types/notifications.types"
 
 /**
  * Response type for notifications API

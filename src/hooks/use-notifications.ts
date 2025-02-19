@@ -1,7 +1,12 @@
-import { Notification } from "@/components/notifications/columns"
-import { addNotification, deleteNotification, getNotifications, notificationsQueryKey, updateNotification } from "@/services/notifications"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import {
+  addNotification,
+  deleteNotification,
+  getNotifications,
+  notificationsQueryKey,
+  updateNotification,
+} from '@/services/notifications'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 /**
  * Parameters for fetching notifications
@@ -26,17 +31,17 @@ interface UseNotificationsParams {
 
 /**
  * Custom hook for fetching notifications with filtering, sorting, and pagination
- * 
+ *
  * Uses TanStack Query for data fetching, caching, and state management.
  * Implements server-side filtering, sorting, and pagination.
- * 
+ *
  * @param {UseNotificationsParams} params - Query parameters for filtering, sorting, and pagination
- * 
+ *
  * @example
  * ```tsx
  * // Basic usage
  * const { data, isLoading } = useNotifications()
- * 
+ *
  * // With filters and pagination
  * const { data, isLoading } = useNotifications({
  *   query: "search term",
@@ -44,14 +49,14 @@ interface UseNotificationsParams {
  *   page: 1,
  *   limit: 10
  * })
- * 
+ *
  * // With sorting
  * const { data, isLoading } = useNotifications({
  *   sort: "dateTime",
  *   order: "desc"
  * })
  * ```
- * 
+ *
  * @returns {UseQueryResult} Query result object containing:
  * - data: NotificationsResponse object with notifications and metadata
  * - isLoading: Boolean indicating initial loading state
@@ -66,20 +71,20 @@ export function useNotifications(params: UseNotificationsParams = {}) {
     queryFn: () => getNotifications(params),
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     refetchOnWindowFocus: false,
-    keepPreviousData: true, // Keep previous data while loading new data
+    // keepPreviousData: true, // Keep previous data while loading new data
   })
 }
 
 /**
  * Custom hook for adding new notifications
- * 
+ *
  * Uses TanStack Query mutations for state updates and cache invalidation.
  * Automatically invalidates and refetches notifications list on success.
- * 
+ *
  * @example
  * ```tsx
  * const { mutate: addNotification, isPending } = useAddNotification()
- * 
+ *
  * // Add a new notification
  * addNotification({
  *   type: "Photo",
@@ -88,7 +93,7 @@ export function useNotifications(params: UseNotificationsParams = {}) {
  *   city: "Dubai"
  * })
  * ```
- * 
+ *
  * @returns {UseMutationResult} Mutation result object containing:
  * - mutate: Function to trigger the mutation
  * - isPending: Boolean indicating loading state
@@ -108,18 +113,18 @@ export function useAddNotification() {
 
 /**
  * Custom hook for deleting notifications
- * 
+ *
  * Uses TanStack Query mutations for state updates and cache invalidation.
  * Shows success/error toasts and automatically refetches notifications list.
- * 
+ *
  * @example
  * ```tsx
  * const { mutate: deleteNotification, isPending } = useDeleteNotification()
- * 
+ *
  * // Delete a notification
  * deleteNotification("notification-id")
  * ```
- * 
+ *
  * @returns {UseMutationResult} Mutation result object containing:
  * - mutate: Function to trigger the deletion
  * - isPending: Boolean indicating loading state
@@ -143,14 +148,14 @@ export function useDeleteNotification() {
 
 /**
  * Custom hook for updating existing notifications
- * 
+ *
  * Uses TanStack Query mutations for state updates and cache invalidation.
  * Shows success/error toasts and automatically refetches notifications list.
- * 
+ *
  * @example
  * ```tsx
  * const { mutate: updateNotification, isPending } = useUpdateNotification()
- * 
+ *
  * // Update a notification
  * updateNotification({
  *   id: "notification-id",
@@ -160,7 +165,7 @@ export function useDeleteNotification() {
  *   }
  * })
  * ```
- * 
+ *
  * @returns {UseMutationResult} Mutation result object containing:
  * - mutate: Function to trigger the update
  * - isPending: Boolean indicating loading state
@@ -171,7 +176,7 @@ export function useUpdateNotification() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Notification> }) =>
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
       updateNotification(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
