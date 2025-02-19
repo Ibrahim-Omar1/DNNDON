@@ -1,0 +1,663 @@
+# Next.js App Router & TypeScript Development Guidelines
+
+## Core Development Stack
+
+- Next.js App Router + TypeScript
+- React Server Components (RSC)
+- Shadcn UI + Radix + TailwindCSS
+- next-auth & next-intl
+- TanStack Query for data fetching
+- Zod for validation
+
+## Code Structure & Style
+
+- Server-first architecture with minimal 'use client'
+- Functional/declarative patterns
+- Directory structure:
+  ```
+  src/
+    app/          # App Router pages
+    components/   # Shared components
+    lib/         # Utilities and helpers
+    types/       # TypeScript definitions
+    middleware/  # Request middleware
+    services/    # API and external services
+    hooks/       # Custom hooks
+    store/       # Global state management
+    styles/      # Global styles and themes
+  ```
+
+## Naming & File Conventions
+
+- Directories: `kebab-case` (e.g., `auth-wizard/`)
+- Components: `PascalCase.tsx`
+- Utilities: `camelCase.ts`
+- Types: `PascalCase.types.ts`
+- Constants: `SCREAMING_SNAKE_CASE.ts`
+- Hooks: `usePascalCase.ts`
+
+## TypeScript Best Practices
+
+- Interfaces over types for objects
+- Literal types instead of enums
+- Zod for validation/type inference
+- Strict type checking enabled
+- Use TypeScript template literal types
+- Proper typing for API responses and requests
+
+## Component Development
+
+- RSC by default, 'use client' only when needed
+- Suspense boundaries for async components
+- Props interface with JSDoc
+- Modular, single-responsibility design
+- Use React Hook Form for form management
+- Implement proper loading states
+
+## UI Development
+
+- Mobile-first with Tailwind responsive classes
+- Shadcn UI + Radix for accessible components
+- Class management:
+  - `cn()` for merging
+  - `cva()` for variants
+- ARIA attributes & keyboard navigation
+- Use Lucide icons consistently
+- Implement proper toast notifications with Sonner
+- Use Shadcn UI carousel for carousels
+- Implement proper modals with Dialog
+
+## Form Handling
+
+- Use react-hook-form for form management
+- Zod schema validation
+- Proper error handling and display
+- Form submission loading states
+- Input masking when needed
+- Implement proper form reset
+
+## Authentication & Authorization
+
+- Implement next-auth for authentication
+- Protected routes and middleware
+- Role-based access control
+- Proper session management
+- Secure API routes
+
+## Performance Optimization
+
+- Server Components (RSC) first
+- Dynamic imports for client components
+- Route segments & parallel routes
+- Image optimization with next/image
+- Suspense streaming & loading states
+- Implement proper caching strategies
+- Use Sharp for image optimization
+
+## Data Management
+
+- Server Components: Use native fetch with proper caching
+- Client Components:
+  - TanStack Query for:
+    - Complex data fetching
+    - Mutations and invalidation
+    - Infinite scrolling
+    - Optimistic updates
+    - Dependent queries
+    - Parallel queries
+    - Data synchronization
+- Server Actions for form submissions and mutations
+- URL state with query parameters
+- Minimize client-side state
+- Proper loading and error states
+
+## Data Fetching Priority
+
+1. Server Components (Preferred):
+
+```typescript
+// In Server Component
+async function ProductPage() {
+  const products = await getProducts()
+  return <ProductList products={products} />
+}
+```
+
+2. Route Handlers:
+   @see https://nextjs.org/docs/14/app/building-your-application/routing/route-handlers
+
+```typescript
+// app/api/products/route.ts
+export async function GET() {
+  const products = await db.products.findMany();
+  return Response.json(products);
+}
+```
+
+3. Server Actions (For Mutations):
+   @see https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations
+
+```typescript
+// Server Action in Server Component
+export async function createProduct(data: ProductData) {
+  'use server';
+  await db.products.create(data);
+  revalidatePath('/products');
+}
+```
+
+4. TanStack Query (Only when necessary):
+
+- Real-time data requirements
+- Complex client-side cache management
+- Optimistic updates
+- Polling/WebSocket integration
+
+```typescript
+// Only in Client Components when needed
+const { data } = useQuery({
+  queryKey: ['real-time-data'],
+  queryFn: fetchRealtimeData,
+  refetchInterval: 1000,
+});
+```
+
+## Code Documentation Standards
+
+### Component Documentation
+
+````typescript
+/**
+ * Product list component with filtering and sorting
+ * @component
+ * @example
+ * ```tsx
+ * <ProductList
+ *   initialProducts={products}
+ *   category="electronics"
+ * />
+ * ```
+ *
+ * @param {Object} props - Component props
+ * @param {Product[]} props.initialProducts - Initial product data
+ * @param {string} [props.category] - Optional category filter
+ * @returns Rendered product list
+ */
+````
+
+### Function Documentation
+
+```typescript
+/**
+ * Fetches and transforms product data
+ * @async
+ * @function
+ * @throws {DatabaseError} When database connection fails
+ * @throws {ValidationError} When product data is invalid
+ *
+ * @param {Object} options - Query options
+ * @param {string} options.category - Product category
+ * @param {number} options.limit - Maximum number of products
+ *
+ * @returns {Promise<Product[]>} Array of product objects
+ */
+```
+
+### Type Documentation
+
+```typescript
+/**
+ * Product entity type definition
+ * @typedef {Object} Product
+ * @property {string} id - Unique product identifier
+ * @property {string} name - Product name
+ * @property {number} price - Product price in cents
+ * @property {ProductStatus} status - Current product status
+ */
+```
+
+### Constants Documentation
+
+```typescript
+/**
+ * API endpoint configuration
+ * @constant
+ * @type {Object}
+ * @property {string} BASE_URL - Base API URL
+ * @property {number} TIMEOUT - Request timeout in ms
+ */
+```
+
+### Git Commit Standards
+
+```
+feat: Add new feature
+fix: Bug fix
+docs: Documentation changes
+style: Code style updates
+refactor: Code refactoring
+perf: Performance improvements
+test: Adding/updating tests
+chore: Maintenance tasks
+```
+
+### Error Handling Documentation
+
+```typescript
+/**
+ * Custom error for API operations
+ * @extends Error
+ * @param {string} message - Error message
+ * @param {number} statusCode - HTTP status code
+ */
+```
+
+### Testing Documentation
+
+```typescript
+/**
+ * @jest-environment jsdom
+ * @group unit
+ * @description Product list component tests
+ */
+```
+
+## Error Handling & Validation
+
+- Error boundaries per feature
+- Zod schemas for validation
+- Typed API responses
+- User-friendly error messages
+- Proper error logging
+- Implement fallback UI
+
+## Internationalization
+
+- next-intl for translations
+- RTL support
+- Format numbers & dates
+- Locale-specific content
+- Currency formatting
+- Date/time formatting with dayjs
+
+## Maps Integration
+
+- Use @vis.gl/react-google-maps for maps
+- Implement proper map loading states
+- Handle map interactions efficiently
+- Optimize marker rendering
+- Implement proper geocoding
+
+## Security
+
+- Implement Turnstile/reCAPTCHA
+- CSRF protection
+- Input sanitization
+- Secure headers
+- Rate limiting
+- Content Security Policy
+
+## Documentation
+
+- JSDoc for public APIs
+- Component usage examples
+- Environment setup guide
+- Performance considerations
+- API documentation
+- State management patterns
+- Authentication flows
+
+## Testing
+
+- Unit tests for utilities
+- Component testing
+- Integration tests
+- E2E tests with Cypress
+- API testing
+- Performance testing
+
+## Structured Data (JSON-LD)
+
+### Setup and Usage
+
+```typescript
+import { Person, WithContext } from 'schema-dts';
+
+// Helper function to generate JSON-LD script tags
+function JsonLd<T extends Thing>(json: WithContext<T>): string {
+  return `<script type="application/ld+json">${JSON.stringify(json)}</script>`;
+}
+```
+
+### Basic Implementation
+
+```typescript
+// In layout.tsx or page.tsx
+import { Organization, WithContext } from 'schema-dts';
+
+const organizationData: WithContext<Organization> = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Your Company Name',
+  url: 'https://your-domain.com',
+  logo: 'https://your-domain.com/logo.png',
+  sameAs: ['https://www.facebook.com/your-company', 'https://twitter.com/your-company'],
+};
+```
+
+### Complex Graph Example
+
+```typescript
+import { Graph } from 'schema-dts';
+
+const websiteStructuredData: Graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': 'https://your-domain.com/about/#page',
+      url: 'https://your-domain.com/about/',
+      name: 'About Us',
+      isPartOf: { '@id': 'https://your-domain.com/#website' },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://your-domain.com/#website',
+      url: 'https://your-domain.com',
+      name: 'Your Website Name',
+      publisher: { '@id': 'https://your-domain.com/#organization' },
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://your-domain.com/#organization',
+      name: 'Your Organization',
+      logo: { '@type': 'ImageObject', url: 'https://your-domain.com/logo.png' },
+    },
+  ],
+};
+```
+
+### Common Schema Types
+
+- WebSite
+- Organization
+- LocalBusiness
+- Product
+- Article
+- BreadcrumbList
+- FAQPage
+- Event
+
+### Implementation Guidelines
+
+- Place JSON-LD in layout for site-wide data
+- Use page-specific schemas in individual pages
+- Validate using Google's Rich Results Test
+- Keep data up to date with content changes
+- Include all required properties
+- Use proper ID references for complex graphs
+
+### Best Practices
+
+- Use TypeScript for schema validation
+- Implement breadcrumbs for navigation
+- Add product schemas for e-commerce
+- Include FAQ schemas where relevant
+- Properly structure article metadata
+- Use proper date formats (ISO 8601)
+- Include proper image dimensions
+
+### Example Component
+
+```typescript
+/**
+ * JSON-LD Schema component for structured data
+ * @component
+ */
+export function SchemaOrg() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Your Site Name',
+          url: 'https://your-domain.com',
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: 'https://your-domain.com/search?q={search_term_string}',
+            'query-input': 'required name=search_term_string'
+          }
+        })
+      }}
+    />
+  )
+}
+```
+
+## Accessibility (WCAG 2.1)
+
+### Core Principles (POUR)
+
+- Perceivable: Information must be presentable in ways all users can perceive
+- Operable: Interface components must be operable by all users
+- Understandable: Information and operation must be understandable
+- Robust: Content must be accessible by current and future tools
+
+### Semantic HTML
+
+```typescript
+// Prefer semantic elements
+const GoodExample = () => (
+  <article>
+    <h1>Main Heading</h1>
+    <nav>
+      <ul>
+        <li><a href="/home">Home</a></li>
+      </ul>
+    </nav>
+    <main>
+      <section aria-labelledby="section-heading">
+        <h2 id="section-heading">Section Title</h2>
+        <p>Content...</p>
+      </section>
+    </main>
+    <footer>Footer content</footer>
+  </article>
+)
+```
+
+### ARIA Implementation
+
+```typescript
+// Use ARIA attributes appropriately
+const AccessibleDialog = () => (
+  <div
+    role="dialog"
+    aria-labelledby="dialog-title"
+    aria-describedby="dialog-desc"
+    aria-modal="true"
+  >
+    <h2 id="dialog-title">Dialog Title</h2>
+    <p id="dialog-desc">Dialog description</p>
+  </div>
+)
+```
+
+### Focus Management
+
+```typescript
+// Proper focus trap in modals
+const Modal = () => {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const node = ref.current
+    if (node) {
+      return createFocusTrap(node, {
+        escapeDeactivates: true,
+        allowOutsideClick: true
+      })
+    }
+  }, [])
+
+  return <div ref={ref}>Modal content</div>
+}
+```
+
+### Color and Contrast
+
+- Minimum contrast ratio of 4.5:1 for normal text
+- Minimum contrast ratio of 3:1 for large text
+- Don't rely on color alone for information
+
+```typescript
+// Use Tailwind classes for accessible colors
+const AccessibleButton = () => (
+  <button className="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+    <span className="sr-only">Submit form</span>
+    Submit
+  </button>
+)
+```
+
+### Keyboard Navigation
+
+- All interactive elements must be keyboard accessible
+- Visible focus indicators
+- Logical tab order
+- Skip links for main content
+
+```typescript
+const SkipLink = () => (
+  <a
+    href="#main-content"
+    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4"
+  >
+    Skip to main content
+  </a>
+)
+```
+
+### Screen Reader Support
+
+- Proper heading hierarchy
+- Alternative text for images
+- ARIA labels for interactive elements
+- Status messages
+
+```typescript
+const ScreenReaderAware = () => (
+  <>
+    <img
+      src="/logo.png"
+      alt="Company logo showing a blue mountain peak"
+      width={200}
+      height={100}
+    />
+    <div role="status" aria-live="polite">
+      Form submitted successfully
+    </div>
+  </>
+)
+```
+
+### Motion and Animation
+
+- Respect reduced motion preferences
+
+```typescript
+const AnimatedComponent = () => (
+  <div className="motion-safe:animate-fade motion-reduce:transition-none">
+    Content
+  </div>
+)
+```
+
+### Form Accessibility
+
+```typescript
+const AccessibleForm = () => (
+  <form noValidate>
+    <div>
+      <label
+        htmlFor="email"
+        className="block text-sm font-medium"
+      >
+        Email
+      </label>
+      <input
+        id="email"
+        type="email"
+        aria-describedby="email-error"
+        required
+        className="mt-1 block w-full rounded-md"
+      />
+      <div id="email-error" aria-live="polite" className="text-red-600">
+        {errors.email?.message}
+      </div>
+    </div>
+  </form>
+)
+```
+
+### Testing Checklist
+
+- Keyboard navigation testing
+- Screen reader testing (NVDA, VoiceOver)
+- Color contrast verification
+- Reduced motion testing
+- Form validation feedback
+- Focus management verification
+- ARIA implementation testing
+
+### Common ARIA Roles and States
+
+```typescript
+// Essential ARIA attributes
+const AriaExamples = {
+  roles: [
+    'alert',
+    'alertdialog',
+    'button',
+    'checkbox',
+    'dialog',
+    'grid',
+    'heading',
+    'link',
+    'listbox',
+    'menu',
+    'menuitem',
+    'progressbar',
+    'radio',
+    'tab',
+    'tabpanel',
+    'tooltip',
+    'tree',
+  ],
+  states: [
+    'aria-expanded',
+    'aria-selected',
+    'aria-checked',
+    'aria-disabled',
+    'aria-hidden',
+    'aria-invalid',
+    'aria-pressed',
+    'aria-current',
+    'aria-describedby',
+    'aria-labelledby',
+    'aria-controls',
+    'aria-live',
+  ],
+};
+```
+
+### Resources
+
+- WCAG 2.1 Guidelines
+- WebAIM Checklist
+- A11Y Project Checklist
+- Axe DevTools
+- NVDA Screen Reader
+- Color Contrast Analyzer
