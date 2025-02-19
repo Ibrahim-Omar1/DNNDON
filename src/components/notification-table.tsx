@@ -84,7 +84,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   )
 
   const [sort, setSort] = useState<{ column?: string; order?: 'asc' | 'desc' }>({});
-  // @ts-expect-error , TODO: fix this
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [filters, setFilters] = useState<{
     query?: string;
     status?: string;
