@@ -3,9 +3,16 @@ import {
   deleteNotification,
   getNotifications,
   notificationsQueryKey,
+  NotificationsResponse,
   updateNotification,
 } from '@/services/notifications'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 /**
@@ -65,7 +72,9 @@ interface UseNotificationsParams {
  * - error: Error object if query failed
  * - refetch: Function to manually refetch data
  */
-export function useNotifications(params: UseNotificationsParams = {}) {
+const useNotifications = (
+  params: UseNotificationsParams = {}
+): UseQueryResult<NotificationsResponse, Error> => {
   return useQuery({
     queryKey: notificationsQueryKey(params),
     queryFn: () => getNotifications(params),
@@ -100,7 +109,7 @@ export function useNotifications(params: UseNotificationsParams = {}) {
  * - isError: Boolean indicating error state
  * - error: Error object if mutation failed
  */
-export function useAddNotification() {
+const useAddNotification = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -131,7 +140,7 @@ export function useAddNotification() {
  * - isError: Boolean indicating error state
  * - error: Error object if deletion failed
  */
-export function useDeleteNotification() {
+const useDeleteNotification = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -166,13 +175,13 @@ export function useDeleteNotification() {
  * })
  * ```
  *
- * @returns {UseMutationResult} Mutation result object containing:
+ * @returns Mutation result object containing:
  * - mutate: Function to trigger the update
  * - isPending: Boolean indicating loading state
  * - isError: Boolean indicating error state
  * - error: Error object if update failed
  */
-export function useUpdateNotification() {
+const useUpdateNotification = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -186,3 +195,5 @@ export function useUpdateNotification() {
     },
   })
 }
+
+export { useAddNotification, useDeleteNotification, useNotifications, useUpdateNotification }
