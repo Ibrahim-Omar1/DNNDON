@@ -92,6 +92,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   const [addModalOpen, setAddModalOpen] = useState(false);
 
   const {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data = {} as any,
     isLoading,
     isError,
