@@ -1,37 +1,159 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Admin Dashboard
+
+A modern admin dashboard built with Next.js 14, TypeScript, and Shadcn UI.
+
+## Features
+
+- 🚀 Next.js 14 App Router
+- 💻 TypeScript
+- 🎨 Tailwind CSS
+- 📱 Responsive Design
+- 🔒 Authentication Ready
+- 📊 Server-Side Pagination
+- 🌐 URL-Based State Management
+- 🎯 Accessible Components
+- 🔄 Real-time Data Updates
+- 📝 Form Validation
+- 🎭 Dark Mode Support
+
+## Tech Stack
+
+- **Framework:** Next.js 14
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** Shadcn UI
+- **State Management:** TanStack Query
+- **Forms:** React Hook Form
+- **Validation:** Zod
+- **Icons:** Lucide Icons
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- pnpm (recommended) or npm
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/your-repo-name.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Create a `.env.local` file:
+```env
+# Your environment variables
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Start the development server:
+```bash
+pnpm dev
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/                # App Router pages
+├── components/         # React components
+│   ├── ui/            # Shadcn UI components
+│   └── notifications/ # Feature components
+├── hooks/             # Custom hooks
+├── lib/              # Utilities
+├── services/         # API services
+├── styles/           # Global styles
+└── types/            # TypeScript types
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Key Components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Data Table
 
-## Deploy on Vercel
+A flexible data table component with:
+- Server-side pagination
+- URL state management
+- Fixed height states
+- Accessible controls
+- Loading states
+- Row number calculations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```tsx
+<DataTable
+  columns={columns}
+  data={data}
+  loading={isLoading}
+  pagination={{
+    page: currentPage,
+    pageSize: pageSize,
+    total: totalItems,
+    onPageChange: handlePageChange,
+    onPageSizeChange: handlePageSizeChange,
+  }}
+/>
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# DNNDON
+### Notification System
+
+- Real-time notifications
+- CRUD operations
+- Status management
+- Filtering capabilities
+- Sort functionality
+
+## Development Guidelines
+
+### Code Style
+
+- Use TypeScript strict mode
+- Follow ESLint rules
+- Use Prettier for formatting
+- Write JSDoc comments
+- Follow component naming conventions
+
+### Component Structure
+
+```tsx
+// Component template
+export interface ComponentProps {
+  // Props interface
+}
+
+export function Component({ prop1, prop2 }: ComponentProps) {
+  // Component logic
+  return (
+    // JSX
+  )
+}
+```
+
+### State Management
+
+- Use React Query for server state
+- URL state for pagination/filters
+- Local state for UI elements
+- Context for theme/auth
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a pull request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Next.js](https://nextjs.org/)
+- [Shadcn UI](https://ui.shadcn.com/)
+- [TanStack Query](https://tanstack.com/query)
+- [Tailwind CSS](https://tailwindcss.com/)

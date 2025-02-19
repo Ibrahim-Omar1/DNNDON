@@ -23,7 +23,7 @@ const navigationItems: NavItem[] = [{
   title: "Home",
   url: "/",
   icon: Home,
-  isActive: true,
+  // isActive: true,
 },
 {
   title: "Analytics",
@@ -49,7 +49,7 @@ const navigationItems: NavItem[] = [{
   title: "Notifications",
   url: "/notifications",
   icon: Bell,
-  isActive: false,
+  // isActive: false,
 },
 
 ]
