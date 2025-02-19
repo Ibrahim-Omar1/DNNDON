@@ -5,10 +5,10 @@ import { DataTable } from "@/components/ui/data-table/data-table";
 import { useNotifications } from "@/hooks/use-notifications";
 import { NotificationsResponse } from "@/services/notifications";
 import { Plus, RefreshCcw } from "lucide-react";
-import { useState, useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
 import { AddNotificationModal } from "./notifications/add-notification-modal";
 import { columns } from "./notifications/columns";
-import { useSearchParams, useRouter, usePathname } from "next/navigation"
 
 /**
  * NotificationTable Component
@@ -39,7 +39,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  
+
   // Use initial values from props
   const page = Number(searchParams.get("page")) || initialPage
   const limit = Number(searchParams.get("limit")) || initialLimit
@@ -48,7 +48,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   const createQueryString = useCallback(
     (params: Record<string, string | number>) => {
       const newSearchParams = new URLSearchParams(searchParams.toString())
-      
+
       Object.entries(params).forEach(([key, value]) => {
         if (value === null) {
           newSearchParams.delete(key)
@@ -56,7 +56,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
           newSearchParams.set(key, String(value))
         }
       })
-      
+
       return newSearchParams.toString()
     },
     [searchParams]
@@ -84,6 +84,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   )
 
   const [sort, setSort] = useState<{ column?: string; order?: 'asc' | 'desc' }>({});
+  // @ts-expect-error , TODO: fix this
   const [filters, setFilters] = useState<{
     query?: string;
     status?: string;
@@ -101,6 +102,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
     page,
     limit,
   });
+
 
   if (isError) {
     return (

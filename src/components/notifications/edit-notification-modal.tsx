@@ -1,5 +1,6 @@
 "use client"
 
+import { type Notification } from '@/types/notifications.types'
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useUpdateNotification } from "@/hooks/use-notifications"
-import { Notification } from "@/components/notifications/columns"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"

@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table"
 import {
   ColumnDef,
-  FilterFn,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -99,13 +98,8 @@ interface DataTableProps<TData, TValue> {
 /**
  * Case-insensitive filter function for global search
  */
-const containsFilter: FilterFn<any> = (row, columnId, value) => {
-  const cellValue = row.getValue(columnId)
-  if (cellValue == null) return false
-
-  return String(cellValue)
-    .toLowerCase()
-    .includes(String(value).toLowerCase())
+const containsFilter = (value: string, filterValue: string): boolean => {
+  return value.toLowerCase().includes(filterValue.toLowerCase())
 }
 
 /**
@@ -164,6 +158,12 @@ export function DataTable<TData, TValue>({
         pageIndex: (pagination?.page || 1) - 1,
       },
     },
+    filterFns: {
+      contains: (row, columnId, filterValue) => {
+        const value = row.getValue(columnId) as string
+        return containsFilter(value, filterValue)
+      }
+    }
   })
 
   // Force update table state when URL params change
