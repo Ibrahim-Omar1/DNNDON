@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { useNotifications } from "@/hooks/use-notifications";
-import { NotificationsResponse } from "@/services/notifications";
 import { Plus, RefreshCcw } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -93,7 +92,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   const [addModalOpen, setAddModalOpen] = useState(false);
 
   const {
-    data = {} as NotificationsResponse,
+    data = {} as any,
     isLoading,
     isError,
     refetch,
