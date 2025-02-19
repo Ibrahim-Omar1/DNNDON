@@ -4,20 +4,12 @@ import { type Notification } from '@/types/notifications.types'
  * Response type for notifications API
  */
 export interface NotificationsResponse {
-  /** Array of notification objects */
   data: Notification[]
-  /** Metadata for pagination and total counts */
   metadata: {
-    /** Total number of notifications */
-    total: number
-    /** Current page number */
-    page: number
-    /** Number of items per page */
-    limit: number
-    /** Total number of pages */
+    currentPage: number
     totalPages: number
-    /** Whether there are more pages */
-    hasMore: boolean
+    pageSize: number
+    totalCount: number
   }
 }
 
@@ -25,28 +17,21 @@ export interface NotificationsResponse {
  * Parameters for fetching notifications
  */
 export interface FetchNotificationsParams {
-  /** Search query string */
   query?: string
-  /** Filter by status */
   status?: string
-  /** Filter by type */
   type?: string
-  /** Page number */
   page?: number
-  /** Items per page */
   limit?: number
-  /** Sort column */
   sort?: string
-  /** Sort order */
   order?: 'asc' | 'desc'
 }
 
 /**
- * Fetches notifications from the API with filtering, pagination, and sorting
+ * Fetches notifications from the API with filtering, pagination, and sorting.
  *
- * @param params - Query parameters for filtering, pagination, and sorting
- * @returns Promise with notifications data and metadata
- * @throws Error if the API request fails
+ * @param params - Query parameters for filtering, pagination, and sorting.
+ * @returns <NotificationsResponse> Promise with notifications data and metadata.
+ * @throws Error if the API request fails.
  *
  * @example
  * ```ts
@@ -58,9 +43,9 @@ export interface FetchNotificationsParams {
  * })
  * ```
  */
-export async function getNotifications(
-  params: FetchNotificationsParams = {}
-): Promise<NotificationsResponse> {
+const getNotifications = async (
+  params: FetchNotificationsParams
+): Promise<NotificationsResponse> => {
   const searchParams = new URLSearchParams()
 
   // Add pagination params
@@ -86,7 +71,14 @@ export async function getNotifications(
 export const notificationsQueryKey = (params: FetchNotificationsParams = {}) =>
   ['notifications', params] as const
 
-export async function addNotification(data: Partial<Notification>): Promise<Notification> {
+/**
+ * Adds a new notification.
+ *
+ * @param data - Partial notification data to add.
+ * @returns Promise with the added notification.
+ * @throws Error if the API request fails.
+ */
+const addNotification = async (data: Partial<Notification>): Promise<Notification> => {
   try {
     const response = await fetch('/api/notifications', {
       method: 'POST',
@@ -106,7 +98,14 @@ export async function addNotification(data: Partial<Notification>): Promise<Noti
   }
 }
 
-export async function deleteNotification(id: string): Promise<void> {
+/**
+ * Deletes a notification by ID.
+ *
+ * @param id - ID of the notification to delete.
+ * @returns Promise that resolves when the notification is deleted.
+ * @throws Error if the API request fails.
+ */
+const deleteNotification = async (id: string): Promise<void> => {
   const response = await fetch(`/api/notifications?id=${id}`, {
     method: 'DELETE',
   })
@@ -116,21 +115,35 @@ export async function deleteNotification(id: string): Promise<void> {
   }
 }
 
-export async function updateNotification(
+/**
+ * Updates an existing notification by ID.
+ *
+ * @param id - ID of the notification to update.
+ * @param data - Partial notification data to update.
+ * @returns Promise with the updated notification.
+ * @throws Error if the API request fails.
+ */
+const updateNotification = async (
   id: string,
   data: Partial<Notification>
-): Promise<Notification> {
-  const response = await fetch(`/api/notifications?id=${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
+): Promise<Notification> => {
+  try {
+    const response = await fetch(`/api/notifications?id=${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
 
-  if (!response.ok) {
-    throw new Error('Failed to update notification')
+    if (!response.ok) {
+      throw new Error('Failed to update notification')
+    }
+
+    return response.json()
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : 'Failed to update notification')
   }
-
-  return response.json()
 }
+
+export { addNotification, deleteNotification, getNotifications, updateNotification }

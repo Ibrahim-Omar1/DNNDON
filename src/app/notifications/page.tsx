@@ -15,16 +15,12 @@ interface PageProps {
 
 const Page = async ({ searchParams }: PageProps) => {
   // Await the searchParams before accessing properties
-  const params = await searchParams
-
-  // Convert and validate pagination params with nullish coalescing
-  const page = Number(params?.page ?? '1')
-  const limit = Number(params?.limit ?? '10')
+  const { page, limit } = await searchParams
 
   return (
-    <div>
-      <NotificationTable initialPage={page} initialLimit={limit} />
-    </div>
+    <>
+      <NotificationTable initialPage={Number(page ?? 1)} initialLimit={Number(limit ?? 10)} />
+    </>
   )
 }
 

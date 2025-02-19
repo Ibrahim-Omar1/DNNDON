@@ -10,89 +10,46 @@ import {
 } from '@/components/ui/table'
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useEffect } from 'react'
+import { Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { DataTablePagination } from './data-table-pagination'
+import { DataTableToolbar } from './data-table-toolbar'
 
-/**
- * Props for configurable columns in the DataTable
- */
 interface ColumnConfig {
-  /** Unique identifier for the column */
   id: string
-  /** Display title for the column */
   title: string
 }
 
-/**
- * Props for filterable columns with options
- */
 interface FilterableColumn extends ColumnConfig {
-  /** Available filter options for the column */
   options: {
-    /** Display label for the option */
     label: string
-    /** Value for the option */
     value: string
   }[]
 }
 
-/**
- * Pagination configuration interface
- */
 interface PaginationConfig {
-  /** Current page number */
   page: number
-  /** Number of items per page */
   pageSize: number
-  /** Total number of items */
   total: number
-  /** Callback when page changes */
   onPageChange: (page: number) => void
-  /** Callback when page size changes */
   onPageSizeChange: (pageSize: number) => void
+  onSort?: (column: string, order: 'asc' | 'desc') => void
 }
 
-/**
- * Custom sorting configuration interface
- */
-interface CustomSorting {
-  /** Currently sorted column */
-  column?: string
-  /** Sort order (ascending or descending) */
-  order?: 'asc' | 'desc'
-  /** Callback when sort changes */
-  onSort: (column: string, order: 'asc' | 'desc') => void
-}
-
-/**
- * Props interface for the DataTable component
- * @template TData - Type of the data array
- * @template TValue - Type of the cell values
- */
 interface DataTableProps<TData, TValue> {
-  /** Column definitions */
   columns: ColumnDef<TData, TValue>[]
-  /** Data to display */
   data: TData[]
-  /** Columns that can be searched */
   searchableColumns?: ColumnConfig[]
-  /** Columns that can be filtered */
   filterableColumns?: FilterableColumn[]
-  /** Loading state */
   loading?: boolean
-  /** Pagination configuration */
   pagination?: PaginationConfig
-  /** Sorting configuration */
-  sorting?: CustomSorting
-  /** Callback when search query changes */
-  onSearch?: (query: string) => void
-  /** Callback when filter changes */
-  onFilter?: (column: string, value: string) => void
 }
 
 /**
@@ -132,14 +89,19 @@ const containsFilter = (value: string, filterValue: string): boolean => {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  searchableColumns,
+  filterableColumns,
   loading = false,
   pagination,
 }: DataTableProps<TData, TValue>) {
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
     pageCount: pagination ? Math.ceil(pagination.total / pagination.pageSize) : undefined,
     onPaginationChange: (updater) => {
@@ -157,7 +119,9 @@ export function DataTable<TData, TValue>({
         pageSize: pagination?.pageSize || 10,
         pageIndex: (pagination?.page || 1) - 1,
       },
+      columnFilters,
     },
+    onColumnFiltersChange: setColumnFilters,
     filterFns: {
       contains: (row, columnId, filterValue) => {
         const value = row.getValue(columnId) as string
@@ -174,6 +138,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
+      <DataTableToolbar
+        table={table}
+        searchableColumns={searchableColumns}
+        filterableColumns={filterableColumns}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -194,26 +163,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-[400px] text-center">
                   <div className="flex items-center justify-center h-full">
-                    <svg
-                      className="animate-spin h-6 w-6 text-muted-foreground"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   </div>
                 </TableCell>
               </TableRow>

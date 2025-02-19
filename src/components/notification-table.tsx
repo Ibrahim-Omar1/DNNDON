@@ -81,23 +81,9 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
     [router, pathname, createQueryString]
   )
 
-  const [sort, setSort] = useState<{ column?: string; order?: 'asc' | 'desc' }>({})
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [filters, setFilters] = useState<{
-    query?: string
-    status?: string
-    type?: string
-  }>({})
   const [addModalOpen, setAddModalOpen] = useState(false)
 
-  const {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data = {} as any,
-    isLoading,
-    isError,
-    refetch,
-    isFetching,
-  } = useNotifications({
+  const { data, isLoading, isError, refetch, isFetching } = useNotifications({
     page,
     limit,
   })
@@ -116,7 +102,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Notifications ({data?.metadata?.total || 0})</h2>
+        <h2 className="text-lg font-semibold">Notifications ({data?.metadata?.totalCount || 0})</h2>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -134,6 +120,8 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
           </Button>
         </div>
       </div>
+
+      {/* datatable */}
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -166,19 +154,10 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
         pagination={{
           page,
           pageSize: limit,
-          total: data?.metadata?.total || 0,
+          total: data?.metadata?.totalCount || 0,
           onPageChange: handlePageChange,
           onPageSizeChange: handleLimitChange,
         }}
-        sorting={{
-          column: sort.column,
-          order: sort.order,
-          onSort: (column: string, order: 'asc' | 'desc') => setSort({ column, order }),
-        }}
-        onSearch={(query: string) => setFilters((prev) => ({ ...prev, query }))}
-        onFilter={(column: string, value: string) =>
-          setFilters((prev) => ({ ...prev, [column]: value }))
-        }
       />
       <AddNotificationModal open={addModalOpen} onOpenChange={setAddModalOpen} />
     </div>
