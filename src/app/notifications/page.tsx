@@ -1,3 +1,4 @@
+import { NotificationTable } from "@/components/notification-table"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -7,8 +8,8 @@ export const metadata: Metadata = {
 
 const page = () => {
   return (
-    <div>
-      <h1>Notifications</h1>
+    <div >
+      <NotificationTable />
     </div>
   )
 }
