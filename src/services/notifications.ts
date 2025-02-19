@@ -91,3 +91,27 @@ export async function getNotifications(params: FetchNotificationsParams = {}): P
  */
 export const notificationsQueryKey = (params: FetchNotificationsParams = {}) => 
   ['notifications', params] as const 
+
+export async function addNotification(data: Partial<Notification>): Promise<Notification> {
+  try {
+    const response = await fetch("/api/notifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return response.json()
+  } catch (error) {
+    throw new Error(
+      error instanceof Error 
+        ? error.message 
+        : "Failed to add notification"
+    )
+  }
+} 

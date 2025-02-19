@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { useNotifications } from "@/hooks/use-notifications";
 import { NotificationsResponse } from "@/services/notifications";
-import { RefreshCcw } from "lucide-react";
+import { Plus, RefreshCcw } from "lucide-react";
 import { useState } from "react";
+import { AddNotificationModal } from "./notifications/add-notification-modal";
 import { columns } from "./notifications/columns";
 
 /**
@@ -36,6 +37,7 @@ export function NotificationTable() {
     status?: string;
     type?: string;
   }>({});
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   const {
     data = {} as NotificationsResponse,
@@ -68,16 +70,26 @@ export function NotificationTable() {
         <h2 className="text-lg font-semibold">
           Notifications ({data?.metadata?.total || 0})
         </h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="gap-2"
-        >
-          <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-          {isFetching ? "Refreshing..." : "Refresh"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="gap-2"
+          >
+            <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+            {isFetching ? "Refreshing..." : "Refresh"}
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => setAddModalOpen(true)}
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Notification
+          </Button>
+        </div>
       </div>
       <DataTable
         columns={columns}
@@ -122,6 +134,10 @@ export function NotificationTable() {
         }}
         onSearch={(query: string) => setFilters(prev => ({ ...prev, query }))}
         onFilter={(column: string, value: string) => setFilters(prev => ({ ...prev, [column]: value }))}
+      />
+      <AddNotificationModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
       />
     </div>
   );

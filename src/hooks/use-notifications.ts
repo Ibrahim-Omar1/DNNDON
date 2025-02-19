@@ -1,5 +1,5 @@
-import { getNotifications, notificationsQueryKey } from "@/services/notifications"
-import { useQuery } from "@tanstack/react-query"
+import { addNotification, getNotifications, notificationsQueryKey } from "@/services/notifications"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 interface UseNotificationsParams {
   query?: string
@@ -51,5 +51,16 @@ export function useNotifications(params: UseNotificationsParams = {}) {
     queryFn: () => getNotifications(params),
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     refetchOnWindowFocus: false,
+  })
+}
+
+export function useAddNotification() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: addNotification,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+    },
   })
 }

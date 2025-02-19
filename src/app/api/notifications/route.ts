@@ -1,4 +1,5 @@
 import { Notification } from "@/components/notifications/columns"
+import { revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 
 // Mock data with more variety
@@ -208,4 +209,42 @@ export async function GET(req: NextRequest) {
 /**
  * Example usage:
  * /api/notifications?query=dubai&status=Delivered&type=Photo&page=1&limit=10&sort=dateTime&order=desc
- */ 
+ */
+
+export async function POST(req: NextRequest) {
+  try {
+    const newNotification = await req.json()
+
+    // Validate the notification data here
+    if (!newNotification.type || !newNotification.country || !newNotification.city) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
+    }
+
+    // Add dateTime if not provided
+    if (!newNotification.dateTime) {
+      newNotification.dateTime = new Date().toLocaleString()
+    }
+
+    // Add status if not provided
+    if (!newNotification.status) {
+      newNotification.status = "In Progress"
+    }
+
+    // Add to notifications array
+    notifications.unshift(newNotification)
+
+    // Revalidate the notifications cache
+    revalidateTag('notifications')
+
+    return NextResponse.json(newNotification, { status: 201 })
+  } catch (error) {
+    console.error("Error adding notification:", error)
+    return NextResponse.json(
+      { error: "Failed to add notification" },
+      { status: 500 }
+    )
+  }
+} 
