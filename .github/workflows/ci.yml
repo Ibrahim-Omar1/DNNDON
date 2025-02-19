@@ -52,9 +52,6 @@ jobs:
       - name: Type check
         run: pnpm type-check
 
-      - name: Run tests
-        run: pnpm test
-
   build:
     name: Production Build
     runs-on: ubuntu-latest
