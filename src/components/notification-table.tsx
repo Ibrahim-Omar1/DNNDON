@@ -5,9 +5,10 @@ import { DataTable } from "@/components/ui/data-table/data-table";
 import { useNotifications } from "@/hooks/use-notifications";
 import { NotificationsResponse } from "@/services/notifications";
 import { Plus, RefreshCcw } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { AddNotificationModal } from "./notifications/add-notification-modal";
 import { columns } from "./notifications/columns";
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 
 /**
  * NotificationTable Component
@@ -28,9 +29,60 @@ import { columns } from "./notifications/columns";
  * <NotificationTable />
  * ```
  */
-export function NotificationTable() {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+
+interface NotificationTableProps {
+  initialPage: number
+  initialLimit: number
+}
+
+export function NotificationTable({ initialPage, initialLimit }: NotificationTableProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  
+  // Use initial values from props
+  const page = Number(searchParams.get("page")) || initialPage
+  const limit = Number(searchParams.get("limit")) || initialLimit
+
+  // Create URL updater function
+  const createQueryString = useCallback(
+    (params: Record<string, string | number>) => {
+      const newSearchParams = new URLSearchParams(searchParams.toString())
+      
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === null) {
+          newSearchParams.delete(key)
+        } else {
+          newSearchParams.set(key, String(value))
+        }
+      })
+      
+      return newSearchParams.toString()
+    },
+    [searchParams]
+  )
+
+  // Update URL when pagination changes
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      router.push(
+        `${pathname}?${createQueryString({ page: newPage, limit })}`,
+        { scroll: false }  // Prevent scrolling to top on page change
+      )
+    },
+    [router, pathname, limit, createQueryString]
+  )
+
+  const handleLimitChange = useCallback(
+    (newLimit: number) => {
+      router.push(
+        `${pathname}?${createQueryString({ page: 1, limit: newLimit })}`,
+        { scroll: false }
+      )
+    },
+    [router, pathname, createQueryString]
+  )
+
   const [sort, setSort] = useState<{ column?: string; order?: 'asc' | 'desc' }>({});
   const [filters, setFilters] = useState<{
     query?: string;
@@ -48,9 +100,6 @@ export function NotificationTable() {
   } = useNotifications({
     page,
     limit,
-    sort: sort.column,
-    order: sort.order,
-    ...filters
   });
 
   if (isError) {
@@ -124,8 +173,8 @@ export function NotificationTable() {
           page,
           pageSize: limit,
           total: data?.metadata?.total || 0,
-          onPageChange: setPage,
-          onPageSizeChange: setLimit,
+          onPageChange: handlePageChange,
+          onPageSizeChange: handleLimitChange,
         }}
         sorting={{
           column: sort.column,

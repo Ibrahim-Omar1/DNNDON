@@ -17,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useAddNotification } from "@/hooks/use-notifications"
+import { useUpdateNotification } from "@/hooks/use-notifications"
+import { Notification } from "@/components/notifications/columns"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import { z } from "zod"
 
 const notificationSchema = z.object({
@@ -28,44 +28,46 @@ const notificationSchema = z.object({
   space: z.string().min(1),
   country: z.string().min(1),
   city: z.string().min(1),
-  // id and dateTime will be generated on the server
-  // status will default to "In Progress"
+  status: z.enum(["Delivered", "In Progress", "Cancelled"]),
+  // id and dateTime are handled separately
 })
 
 type NotificationFormData = z.infer<typeof notificationSchema>
 
-interface AddNotificationModalProps {
+interface EditNotificationModalProps {
+  notification: Notification
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function AddNotificationModal({
+export function EditNotificationModal({
+  notification,
   open,
   onOpenChange,
-}: AddNotificationModalProps) {
-  const { mutate: addNotification, isPending } = useAddNotification()
+}: EditNotificationModalProps) {
+  const { mutate: updateNotification, isPending } = useUpdateNotification()
 
   const form = useForm<NotificationFormData>({
     resolver: zodResolver(notificationSchema),
     defaultValues: {
-      type: "Photo",
-      space: "230 X 500 PX",
-      country: "",
-      city: "",
+      type: notification.type,
+      space: notification.space,
+      country: notification.country,
+      city: notification.city,
+      status: notification.status,
     },
   })
 
   const onSubmit = (data: NotificationFormData) => {
-    addNotification(data, {
-      onSuccess: () => {
-        toast.success("Notification added successfully")
-        form.reset()
-        onOpenChange(false)
-      },
-      onError: () => {
-        toast.error("Failed to add notification")
-      },
-    })
+    updateNotification(
+      { id: notification.id, data },
+      {
+        onSuccess: () => {
+          form.reset()
+          onOpenChange(false)
+        },
+      }
+    )
   }
 
   return (
@@ -73,9 +75,9 @@ export function AddNotificationModal({
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Add Notification</DialogTitle>
+            <DialogTitle>Edit Notification</DialogTitle>
             <DialogDescription>
-              Create a new notification with the form below.
+              Update the notification details below.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -96,29 +98,24 @@ export function AddNotificationModal({
                 </SelectContent>
               </Select>
             </div>
+            {/* Other form fields similar to AddNotificationModal */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="space">Space</label>
-              <Input
-                id="space"
-                className="col-span-3"
-                {...form.register("space")}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="country">Country</label>
-              <Input
-                id="country"
-                className="col-span-3"
-                {...form.register("country")}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="city">City</label>
-              <Input
-                id="city"
-                className="col-span-3"
-                {...form.register("city")}
-              />
+              <label htmlFor="status">Status</label>
+              <Select
+                value={form.watch("status")}
+                onValueChange={(value: "Delivered" | "In Progress" | "Cancelled") =>
+                  form.setValue("status", value)
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Delivered">Delivered</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
@@ -126,7 +123,7 @@ export function AddNotificationModal({
               type="submit"
               disabled={isPending}
             >
-              {isPending ? "Adding..." : "Add Notification"}
+              {isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>

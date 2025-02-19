@@ -10,23 +10,14 @@ import {
 } from "@/components/ui/table"
 import {
   ColumnDef,
-  ColumnFiltersState,
   FilterFn,
   flexRender,
   getCoreRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  type OnChangeFn,
+  useReactTable
 } from "@tanstack/react-table"
-import { useState } from "react"
+import { useEffect } from "react"
 import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
 
 /**
  * Props for configurable columns in the DataTable
@@ -147,135 +138,44 @@ const containsFilter: FilterFn<any> = (row, columnId, value) => {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  searchableColumns = [],
-  filterableColumns = [],
   loading = false,
   pagination,
-  sorting,
-  onSearch,
-  onFilter,
 }: DataTableProps<TData, TValue>) {
-  // State management
-  const [tableSorting, setTableSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = useState("")
-  const [rowSelection, setRowSelection] = useState({})
-  const [columnVisibility, setColumnVisibility] = useState({})
-  const [columnPinning, setColumnPinning] = useState({})
-
-  /**
-   * Handles sorting state changes and converts between table sorting and custom sorting
-   */
-  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
-    // Handle both function updater and direct value
-    const newSorting = typeof updater === 'function' ? updater(tableSorting) : updater
-    setTableSorting(newSorting)
-
-    // Convert table sorting to custom sorting format
-    if (newSorting.length > 0 && sorting?.onSort) {
-      const { id, desc } = newSorting[0]
-      sorting.onSort(id, desc ? 'desc' : 'asc')
-    } else if (newSorting.length === 0 && sorting?.onSort) {
-      // Clear sorting
-      sorting.onSort('', 'asc')
-    }
-  }
-
   const table = useReactTable({
     data,
     columns,
-
-    // Core features
     getCoreRowModel: getCoreRowModel(),
-
-    // Pagination features
     getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: Boolean(pagination), // Enable manual pagination when prop is provided
+    manualPagination: true,
     pageCount: pagination ? Math.ceil(pagination.total / pagination.pageSize) : undefined,
     onPaginationChange: (updater) => {
-      const state = table.getState()
+      const state = typeof updater === 'function' ? updater(table.getState().pagination) : updater
+
       if (pagination?.onPageChange) {
-        pagination.onPageChange(state.pagination.pageIndex + 1)
+        pagination.onPageChange(state.pageIndex + 1)
       }
-      if (pagination?.onPageSizeChange) {
-        pagination.onPageSizeChange(state.pagination.pageSize)
+      if (pagination?.onPageSizeChange && state.pageSize !== table.getState().pagination.pageSize) {
+        pagination.onPageSizeChange(state.pageSize)
       }
     },
-
-    // Sorting features
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: handleSortingChange,
-    manualSorting: Boolean(sorting), // Enable manual sorting when prop is provided
-
-    // Filtering features
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: containsFilter,
-    manualFiltering: Boolean(onFilter),
-
-    // Row selection features
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-
-    // Column management
-    enableColumnResizing: true,
-    enableHiding: true,
-    onColumnVisibilityChange: setColumnVisibility,
-    enablePinning: true,
-    onColumnPinningChange: setColumnPinning,
-
-    // Faceted search features
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-
-    // State management
     state: {
-      sorting: tableSorting,
-      columnFilters,
-      globalFilter,
-      rowSelection,
-      columnVisibility,
-      columnPinning,
-    },
-
-    // Initial configuration
-    initialState: {
       pagination: {
         pageSize: pagination?.pageSize || 10,
         pageIndex: (pagination?.page || 1) - 1,
       },
-      columnVisibility: {
-        // Hide any columns marked as hidden by default
-        ...columns.reduce((acc, col) => ({
-          ...acc,
-          [(col as any).id]: !(col as any).hidden,
-        }), {}),
-      },
     },
-
-    // Debug mode in development
-    debugTable: process.env.NODE_ENV === 'development',
-    debugHeaders: process.env.NODE_ENV === 'development',
-    debugColumns: process.env.NODE_ENV === 'development',
   })
+
+  // Force update table state when URL params change
+  useEffect(() => {
+    table.setPageIndex(pagination?.page ? pagination.page - 1 : 0)
+    table.setPageSize(pagination?.pageSize || 10)
+  }, [table, pagination?.page, pagination?.pageSize])
 
   return (
     <div className="space-y-4">
-      {/* Toolbar with search, filters and view options */}
-      <DataTableToolbar
-        table={table}
-        searchableColumns={searchableColumns}
-        filterableColumns={filterableColumns}
-        globalFilter={globalFilter}
-        setGlobalFilter={setGlobalFilter}
-      />
-
-      {/* Main table container */}
       <div className="rounded-md border">
         <Table>
-          {/* Table Header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -292,17 +192,34 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-
-          {/* Table Body */}
           <TableBody>
             {loading ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-[400px] text-center"
                 >
-                  <div className="flex items-center justify-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                  <div className="flex items-center justify-center h-full">
+                    <svg
+                      className="animate-spin h-6 w-6 text-muted-foreground"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
                   </div>
                 </TableCell>
               </TableRow>
@@ -327,18 +244,21 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-[400px] text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center h-full space-y-1">
+                    <div className="text-muted-foreground">No results.</div>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-
-      {/* Pagination controls */}
-      <DataTablePagination table={table} />
+      <DataTablePagination
+        table={table}
+        totalRows={pagination?.total}
+      />
     </div>
   )
 } 

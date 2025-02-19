@@ -8,9 +8,14 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash } from "lucide-react"
+import { useState } from "react"
+import { EditNotificationModal } from "./edit-notification-modal"
+import { useDeleteNotification } from "@/hooks/use-notifications"
+import { DeleteNotificationDialog } from "./delete-notification-dialog"
 
 export type Notification = {
+  id: string
   type: "Photo" | "Text"
   space: string
   country: string
@@ -20,6 +25,18 @@ export type Notification = {
 }
 
 export const columns: ColumnDef<Notification>[] = [
+  {
+    id: "number",
+    header: "#",
+    cell: ({ row }) => {
+      return (
+        <div className="text-sm text-muted-foreground w-10">
+          {row.index + 1}
+        </div>
+      )
+    },
+    enableSorting: false,
+  },
   {
     accessorKey: "type",
     header: ({ column }) => {
@@ -100,20 +117,47 @@ export const columns: ColumnDef<Notification>[] = [
     id: "actions",
     cell: ({ row }) => {
       const notification = row.original
+      const [showEditModal, setShowEditModal] = useState(false)
+      const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full">
-              <MoreHorizontal className="h-4 w-4 text-gray-500" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => setShowEditModal(true)}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <EditNotificationModal
+            notification={notification}
+            open={showEditModal}
+            onOpenChange={setShowEditModal}
+          />
+
+          <DeleteNotificationDialog
+            notificationId={notification.id}
+            open={showDeleteDialog}
+            onOpenChange={setShowDeleteDialog}
+          />
+        </>
       )
     },
   },

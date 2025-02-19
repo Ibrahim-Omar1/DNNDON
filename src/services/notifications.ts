@@ -61,12 +61,9 @@ export interface FetchNotificationsParams {
 export async function getNotifications(params: FetchNotificationsParams = {}): Promise<NotificationsResponse> {
   const searchParams = new URLSearchParams()
   
-  // Add params to query string
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined) {
-      searchParams.append(key, value.toString())
-    }
-  })
+  // Add pagination params
+  if (params.page) searchParams.append("page", params.page.toString())
+  if (params.limit) searchParams.append("limit", params.limit.toString())
 
   try {
     const response = await fetch(`/api/notifications?${searchParams.toString()}`)
@@ -75,8 +72,7 @@ export async function getNotifications(params: FetchNotificationsParams = {}): P
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const data = await response.json()
-    return data
+    return response.json()
   } catch (error) {
     throw new Error(
       error instanceof Error 
@@ -114,4 +110,30 @@ export async function addNotification(data: Partial<Notification>): Promise<Noti
         : "Failed to add notification"
     )
   }
+}
+
+export async function deleteNotification(id: string): Promise<void> {
+  const response = await fetch(`/api/notifications?id=${id}`, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to delete notification')
+  }
+}
+
+export async function updateNotification(id: string, data: Partial<Notification>): Promise<Notification> {
+  const response = await fetch(`/api/notifications?id=${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to update notification')
+  }
+
+  return response.json()
 } 

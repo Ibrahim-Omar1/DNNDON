@@ -6,12 +6,26 @@ export const metadata: Metadata = {
   description: "Notifications",
 }
 
-const page = () => {
+interface PageProps {
+  searchParams: Promise<{
+    page?: string
+    limit?: string
+  }>
+}
+
+const Page = async ({ searchParams }: PageProps) => {
+  // Await the searchParams before accessing properties
+  const params = await searchParams
+
+  // Convert and validate pagination params with nullish coalescing
+  const page = Number(params?.page ?? "1")
+  const limit = Number(params?.limit ?? "10")
+
   return (
-    <div >
-      <NotificationTable />
+    <div>
+      <NotificationTable initialPage={page} initialLimit={limit} />
     </div>
   )
 }
 
-export default page
+export default Page

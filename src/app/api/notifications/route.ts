@@ -2,9 +2,14 @@ import { Notification } from "@/components/notifications/columns"
 import { revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 
-// Mock data with more variety
+/**
+ * Mock database for notifications
+ * In a real application, this would be replaced with a proper database
+ * @type {Notification[]}
+ */
 const notifications: Notification[] = [
   {
+    id: "1",
     type: "Photo",
     space: "230 X 500 PX",
     country: "Saudi Arabia",
@@ -13,6 +18,7 @@ const notifications: Notification[] = [
     status: "Delivered",
   },
   {
+    id: "2",
     type: "Text",
     space: "PX 230 X 500",
     country: "United Arab Emirates",
@@ -21,6 +27,7 @@ const notifications: Notification[] = [
     status: "In Progress",
   },
   {
+    id: "3",
     type: "Text",
     space: "PX 230 X 500",
     country: "Kuwait",
@@ -29,6 +36,7 @@ const notifications: Notification[] = [
     status: "Cancelled",
   },
   {
+    id: "4",
     type: "Photo",
     space: "PX 230 X 500",
     country: "Qatar",
@@ -37,6 +45,7 @@ const notifications: Notification[] = [
     status: "Delivered",
   },
   {
+    id: "5",
     type: "Text",
     space: "PX 230 X 500",
     country: "Bahrain",
@@ -45,6 +54,7 @@ const notifications: Notification[] = [
     status: "In Progress",
   },
   {
+    id: "6",
     type: "Photo",
     space: "230 X 500 PX",
     country: "Oman",
@@ -53,6 +63,7 @@ const notifications: Notification[] = [
     status: "Delivered",
   },
   {
+    id: "7",
     type: "Text",
     space: "PX 230 X 500",
     country: "Egypt",
@@ -61,6 +72,7 @@ const notifications: Notification[] = [
     status: "In Progress",
   },
   {
+    id: "8",
     type: "Photo",
     space: "230 X 500 PX",
     country: "Jordan",
@@ -69,6 +81,7 @@ const notifications: Notification[] = [
     status: "Cancelled",
   },
   {
+    id: "9",
     type: "Text",
     space: "PX 230 X 500",
     country: "Lebanon",
@@ -77,6 +90,7 @@ const notifications: Notification[] = [
     status: "Delivered",
   },
   {
+    id: "10",
     type: "Photo",
     space: "230 X 500 PX",
     country: "Iraq",
@@ -85,6 +99,7 @@ const notifications: Notification[] = [
     status: "In Progress",
   },
   {
+    id: "11",
     type: "Text",
     space: "PX 230 X 500",
     country: "Yemen",
@@ -93,6 +108,7 @@ const notifications: Notification[] = [
     status: "Cancelled",
   },
   {
+    id: "12",
     type: "Photo",
     space: "230 X 500 PX",
     country: "Syria",
@@ -101,6 +117,7 @@ const notifications: Notification[] = [
     status: "Delivered",
   },
   {
+    id: "13",
     type: "Text",
     space: "PX 230 X 500",
     country: "Palestine",
@@ -109,6 +126,7 @@ const notifications: Notification[] = [
     status: "In Progress",
   },
   {
+    id: "14",
     type: "Photo",
     space: "230 X 500 PX",
     country: "Libya",
@@ -117,6 +135,7 @@ const notifications: Notification[] = [
     status: "Cancelled",
   },
   {
+    id: "15",
     type: "Text",
     space: "PX 230 X 500",
     country: "Tunisia",
@@ -127,74 +146,42 @@ const notifications: Notification[] = [
 ]
 
 /**
- * GET handler for notifications with filtering, pagination, and sorting
+ * GET handler for notifications with server-side pagination
+ * 
+ * @param {NextRequest} req - The incoming request object
+ * 
+ * @example
+ * ```ts
+ * GET /api/notifications?page=1&limit=10
+ * ```
  */
 export async function GET(req: NextRequest) {
   try {
-    // Get query parameters
     const searchParams = req.nextUrl.searchParams
-    const query = searchParams.get("query")?.toLowerCase()
-    const status = searchParams.get("status")
-    const type = searchParams.get("type")
-    const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "10")
-    const sort = searchParams.get("sort")
-    const order = searchParams.get("order") || "asc"
-
-    // Filter notifications
-    let filteredNotifications = [...notifications]
-
-    // Apply search query filter
-    if (query) {
-      filteredNotifications = filteredNotifications.filter(
-        (notification) =>
-          notification.country.toLowerCase().includes(query) ||
-          notification.city.toLowerCase().includes(query)
-      )
-    }
-
-    // Apply status filter
-    if (status) {
-      filteredNotifications = filteredNotifications.filter(
-        (notification) => notification.status === status
-      )
-    }
-
-    // Apply type filter
-    if (type) {
-      filteredNotifications = filteredNotifications.filter(
-        (notification) => notification.type === type
-      )
-    }
-
-    // Apply sorting
-    if (sort) {
-      filteredNotifications.sort((a: any, b: any) => {
-        const aValue = a[sort]
-        const bValue = b[sort]
-        return order === "asc" 
-          ? aValue > bValue ? 1 : -1
-          : aValue < bValue ? 1 : -1
-      })
-    }
+    
+    // Await searchParams values
+    const pageParam = await searchParams.get("page")
+    const limitParam = await searchParams.get("limit")
+    
+    // Use nullish coalescing for defaults
+    const page = Number(pageParam ?? "1")
+    const limit = Number(limitParam ?? "10")
 
     // Calculate pagination
-    const start = (page - 1) * limit
-    const end = start + limit
-    const paginatedNotifications = filteredNotifications.slice(start, end)
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
+    const paginatedData = notifications.slice(startIndex, endIndex)
 
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Return response with metadata
     return NextResponse.json({
-      data: paginatedNotifications,
+      data: paginatedData,
       metadata: {
-        total: filteredNotifications.length,
+        total: notifications.length,
         page,
         limit,
-        totalPages: Math.ceil(filteredNotifications.length / limit),
-        hasMore: end < filteredNotifications.length,
+        totalPages: Math.ceil(notifications.length / limit),
       },
     })
   } catch (error) {
@@ -207,15 +194,36 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * Example usage:
- * /api/notifications?query=dubai&status=Delivered&type=Photo&page=1&limit=10&sort=dateTime&order=desc
+ * POST handler for creating new notifications
+ * 
+ * Validates required fields and generates:
+ * - Unique ID
+ * - Timestamp
+ * - Default status
+ * 
+ * @param {NextRequest} req - The incoming request object
+ * 
+ * @example
+ * ```ts
+ * POST /api/notifications
+ * {
+ *   "type": "Photo",
+ *   "space": "230 X 500 PX",
+ *   "country": "UAE",
+ *   "city": "Dubai"
+ * }
+ * ```
+ * 
+ * @returns {Promise<NextResponse>} JSON response containing the created notification
+ * @throws {NextResponse} 
+ * - 400 status code on validation error
+ * - 500 status code on server error
  */
-
 export async function POST(req: NextRequest) {
   try {
     const newNotification = await req.json()
 
-    // Validate the notification data here
+    // Validate required fields
     if (!newNotification.type || !newNotification.country || !newNotification.city) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -223,23 +231,19 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Add dateTime if not provided
-    if (!newNotification.dateTime) {
-      newNotification.dateTime = new Date().toLocaleString()
-    }
-
-    // Add status if not provided
-    if (!newNotification.status) {
-      newNotification.status = "In Progress"
+    // Create complete notification object
+    const notification: Notification = {
+      ...newNotification,
+      id: crypto.randomUUID(),
+      dateTime: newNotification.dateTime || new Date().toLocaleString(),
+      status: newNotification.status || "In Progress",
     }
 
     // Add to notifications array
-    notifications.unshift(newNotification)
-
-    // Revalidate the notifications cache
+    notifications.unshift(notification)
     revalidateTag('notifications')
 
-    return NextResponse.json(newNotification, { status: 201 })
+    return NextResponse.json(notification, { status: 201 })
   } catch (error) {
     console.error("Error adding notification:", error)
     return NextResponse.json(
@@ -247,4 +251,121 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     )
   }
-} 
+}
+
+/**
+ * DELETE handler for removing notifications
+ * 
+ * Removes a notification by ID and revalidates the cache
+ * 
+ * @param - The incoming request object
+ * 
+ * @example
+ * ```ts
+ * DELETE /api/notifications?id=notification-id
+ * ```
+ * 
+ * @returns JSON response indicating success
+ * @throws
+ * - 400 status code if ID is missing
+ * - 404 status code if notification not found
+ * - 500 status code on server error
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = req.nextUrl
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Missing notification ID" },
+        { status: 400 }
+      )
+    }
+
+    const index = notifications.findIndex(n => n.id === id)
+    if (index === -1) {
+      return NextResponse.json(
+        { error: "Notification not found" },
+        { status: 404 }
+      )
+    }
+
+    notifications.splice(index, 1)
+    revalidateTag('notifications')
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to delete notification" },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * PUT handler for updating notifications
+ * 
+ * Updates an existing notification by ID and revalidates the cache.
+ * Automatically updates the timestamp when changes are made.
+ * 
+ * @param {NextRequest} req - The incoming request object
+ * 
+ * @example
+ * ```ts
+ * PUT /api/notifications?id=notification-id
+ * {
+ *   "status": "Delivered",
+ *   "city": "New City"
+ * }
+ * ```
+ * 
+ * @returns {Promise<NextResponse>} JSON response containing the updated notification
+ * @throws {NextResponse}
+ * - 400 status code if ID is missing
+ * - 404 status code if notification not found
+ * - 500 status code on server error
+ */
+export async function PUT(req: NextRequest) {
+  try {
+    const { searchParams } = req.nextUrl
+    const id = searchParams.get('id')
+    const updates = await req.json()
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Missing notification ID" },
+        { status: 400 }
+      )
+    }
+
+    const index = notifications.findIndex(n => n.id === id)
+    if (index === -1) {
+      return NextResponse.json(
+        { error: "Notification not found" },
+        { status: 404 }
+      )
+    }
+
+    // Update notification with new timestamp
+    notifications[index] = {
+      ...notifications[index],
+      ...updates,
+      dateTime: new Date().toLocaleString(),
+    }
+
+    revalidateTag('notifications')
+
+    return NextResponse.json(notifications[index])
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to update notification" },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * Example usage:
+ * /api/notifications?query=dubai&status=Delivered&type=Photo&page=1&limit=10&sort=dateTime&order=desc
+ */ 
