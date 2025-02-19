@@ -1,15 +1,13 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Notifications",
-  description: "Notifications",
+  title: "Add Notification",
+  description: "Add Notification",
 }
 
 const page = () => {
   return (
-    <div>
-      <h1>Notifications</h1>
-    </div>
+    <div>add notification</div>
   )
 }
 

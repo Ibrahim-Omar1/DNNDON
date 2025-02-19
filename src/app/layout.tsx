@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning suppressContentEditableWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -40,7 +40,7 @@ export default function RootLayout({
           <AppSidebar />
           <SidebarInset>
             <MainNavbar />
-            <main className="px-4">
+            <main className="p-4">
               {children}
             </main>
           </SidebarInset>
