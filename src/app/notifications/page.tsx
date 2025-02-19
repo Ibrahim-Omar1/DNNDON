@@ -17,8 +17,6 @@ const Page = async ({ searchParams }: PageProps) => {
   // Await the searchParams before accessing properties
   const { page, limit } = await searchParams
 
-
-
   return (
     <>
       <NotificationTable initialPage={Number(page ?? 1)} initialLimit={Number(limit ?? 10)} />

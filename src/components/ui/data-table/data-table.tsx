@@ -22,12 +22,10 @@ import { useEffect, useState } from 'react'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableToolbar } from './data-table-toolbar'
 
-
 interface ColumnConfig {
   id: string
   title: string
 }
-
 
 interface FilterableColumn extends ColumnConfig {
   options: {
@@ -35,7 +33,6 @@ interface FilterableColumn extends ColumnConfig {
     value: string
   }[]
 }
-
 
 interface PaginationConfig {
   page: number
@@ -46,13 +43,11 @@ interface PaginationConfig {
   onSort?: (column: string, order: 'asc' | 'desc') => void
 }
 
-
 interface CustomSorting {
   column?: string
   order?: 'asc' | 'desc'
   onSort: (column: string, order: 'asc' | 'desc') => void
 }
-
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -149,7 +144,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} searchableColumns={searchableColumns} filterableColumns={filterableColumns} />
+      <DataTableToolbar
+        table={table}
+        searchableColumns={searchableColumns}
+        filterableColumns={filterableColumns}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

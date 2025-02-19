@@ -81,20 +81,12 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
     [router, pathname, createQueryString]
   )
 
-
   const [addModalOpen, setAddModalOpen] = useState(false)
 
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    isFetching,
-  } = useNotifications({
+  const { data, isLoading, isError, refetch, isFetching } = useNotifications({
     page,
     limit,
   })
-
 
   if (isError) {
     return (

@@ -25,15 +25,9 @@ const ColumnHeaderOptions = ({ column }: { column: Column<Notification> }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-          Ascending
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-          Descending
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => column.clearSorting()}>
-          None
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => column.toggleSorting(true)}>Ascending</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => column.toggleSorting(false)}>Descending</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => column.clearSorting()}>None</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
