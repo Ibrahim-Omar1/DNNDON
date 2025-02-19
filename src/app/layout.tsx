@@ -40,7 +40,9 @@ export default function RootLayout({
           <AppSidebar />
           <SidebarInset>
             <MainNavbar />
-            {children}
+            <main className="px-4">
+              {children}
+            </main>
           </SidebarInset>
         </SidebarProvider>
       </body>
