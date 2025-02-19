@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { DataTable } from "@/components/ui/data-table/data-table";
-import { useNotifications } from "@/hooks/use-notifications";
-import { Plus, RefreshCcw } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
-import { AddNotificationModal } from "./notifications/add-notification-modal";
-import { columns } from "./notifications/columns";
+import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/ui/data-table/data-table'
+import { useNotifications } from '@/hooks/use-notifications'
+import { Plus, RefreshCcw } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useState } from 'react'
+import { AddNotificationModal } from './notifications/add-notification-modal'
+import { columns } from './notifications/columns'
 
 /**
  * NotificationTable Component
- * 
+ *
  * A data table component that displays notifications with filtering, sorting, and pagination.
  * Uses React Query for data fetching and state management.
- * 
+ *
  * Features:
  * - Server-side pagination
  * - Server-side sorting
@@ -22,7 +22,7 @@ import { columns } from "./notifications/columns";
  * - Real-time data updates
  * - Loading states
  * - Error handling
- * 
+ *
  * @example
  * ```tsx
  * <NotificationTable />
@@ -40,8 +40,8 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
   const searchParams = useSearchParams()
 
   // Use initial values from props
-  const page = Number(searchParams.get("page")) || initialPage
-  const limit = Number(searchParams.get("limit")) || initialLimit
+  const page = Number(searchParams.get('page')) || initialPage
+  const limit = Number(searchParams.get('limit')) || initialLimit
 
   // Create URL updater function
   const createQueryString = useCallback(
@@ -66,7 +66,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
     (newPage: number) => {
       router.push(
         `${pathname}?${createQueryString({ page: newPage, limit })}`,
-        { scroll: false }  // Prevent scrolling to top on page change
+        { scroll: false } // Prevent scrolling to top on page change
       )
     },
     [router, pathname, limit, createQueryString]
@@ -74,22 +74,21 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
 
   const handleLimitChange = useCallback(
     (newLimit: number) => {
-      router.push(
-        `${pathname}?${createQueryString({ page: 1, limit: newLimit })}`,
-        { scroll: false }
-      )
+      router.push(`${pathname}?${createQueryString({ page: 1, limit: newLimit })}`, {
+        scroll: false,
+      })
     },
     [router, pathname, createQueryString]
   )
 
-  const [sort, setSort] = useState<{ column?: string; order?: 'asc' | 'desc' }>({});
+  const [sort, setSort] = useState<{ column?: string; order?: 'asc' | 'desc' }>({})
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [filters, setFilters] = useState<{
-    query?: string;
-    status?: string;
-    type?: string;
-  }>({});
-  const [addModalOpen, setAddModalOpen] = useState(false);
+    query?: string
+    status?: string
+    type?: string
+  }>({})
+  const [addModalOpen, setAddModalOpen] = useState(false)
 
   const {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,12 +96,11 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
     isLoading,
     isError,
     refetch,
-    isFetching
+    isFetching,
   } = useNotifications({
     page,
     limit,
-  });
-
+  })
 
   if (isError) {
     return (
@@ -112,15 +110,13 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
           Try again
         </Button>
       </div>
-    );
+    )
   }
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">
-          Notifications ({data?.metadata?.total || 0})
-        </h2>
+        <h2 className="text-lg font-semibold">Notifications ({data?.metadata?.total || 0})</h2>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -129,14 +125,10 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
             disabled={isFetching}
             className="gap-2"
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-            {isFetching ? "Refreshing..." : "Refresh"}
+            <RefreshCcw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            {isFetching ? 'Refreshing...' : 'Refresh'}
           </Button>
-          <Button
-            size="sm"
-            onClick={() => setAddModalOpen(true)}
-            className="gap-2"
-          >
+          <Button size="sm" onClick={() => setAddModalOpen(true)} className="gap-2">
             <Plus className="h-4 w-4" />
             Add Notification
           </Button>
@@ -148,26 +140,26 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
         loading={isLoading}
         searchableColumns={[
           {
-            id: "country",
-            title: "Country",
+            id: 'country',
+            title: 'Country',
           },
         ]}
         filterableColumns={[
           {
-            id: "status",
-            title: "Status",
+            id: 'status',
+            title: 'Status',
             options: [
-              { label: "Delivered", value: "Delivered" },
-              { label: "In Progress", value: "In Progress" },
-              { label: "Cancelled", value: "Cancelled" },
+              { label: 'Delivered', value: 'Delivered' },
+              { label: 'In Progress', value: 'In Progress' },
+              { label: 'Cancelled', value: 'Cancelled' },
             ],
           },
           {
-            id: "type",
-            title: "Type",
+            id: 'type',
+            title: 'Type',
             options: [
-              { label: "Photo", value: "Photo" },
-              { label: "Text", value: "Text" },
+              { label: 'Photo', value: 'Photo' },
+              { label: 'Text', value: 'Text' },
             ],
           },
         ]}
@@ -183,14 +175,12 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
           order: sort.order,
           onSort: (column: string, order: 'asc' | 'desc') => setSort({ column, order }),
         }}
-        onSearch={(query: string) => setFilters(prev => ({ ...prev, query }))}
-        onFilter={(column: string, value: string) => setFilters(prev => ({ ...prev, [column]: value }))}
+        onSearch={(query: string) => setFilters((prev) => ({ ...prev, query }))}
+        onFilter={(column: string, value: string) =>
+          setFilters((prev) => ({ ...prev, [column]: value }))
+        }
       />
-      <AddNotificationModal
-        open={addModalOpen}
-        onOpenChange={setAddModalOpen}
-      />
+      <AddNotificationModal open={addModalOpen} onOpenChange={setAddModalOpen} />
     </div>
-  );
+  )
 }
-

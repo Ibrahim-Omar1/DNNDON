@@ -1,9 +1,9 @@
-import { NotificationTable } from "@/components/notification-table"
-import { Metadata } from "next"
+import { NotificationTable } from '@/components/notification-table'
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "Notifications",
-  description: "Notifications",
+  title: 'Notifications',
+  description: 'Notifications',
 }
 
 interface PageProps {
@@ -18,8 +18,8 @@ const Page = async ({ searchParams }: PageProps) => {
   const params = await searchParams
 
   // Convert and validate pagination params with nullish coalescing
-  const page = Number(params?.page ?? "1")
-  const limit = Number(params?.limit ?? "10")
+  const page = Number(params?.page ?? '1')
+  const limit = Number(params?.limit ?? '10')
 
   return (
     <div>

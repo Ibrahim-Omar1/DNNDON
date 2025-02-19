@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { Input } from "@/components/ui/input"
-import { Table } from "@tanstack/react-table"
-import { Search } from "lucide-react"
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { DataTableViewOptions } from "./data-table-view-options"
-import { Button } from "@/components/ui/button"
+import { Input } from '@/components/ui/input'
+import { Table } from '@tanstack/react-table'
+import { Search } from 'lucide-react'
+import { DataTableFacetedFilter } from './data-table-faceted-filter'
+import { DataTableViewOptions } from './data-table-view-options'
+import { Button } from '@/components/ui/button'
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -31,7 +31,7 @@ export function DataTableToolbar<TData>({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder={`Search ${searchableColumns[0].title}...`}
-              value={(table.getColumn(searchableColumns[0].id)?.getFilterValue() as string) ?? ""}
+              value={(table.getColumn(searchableColumns[0].id)?.getFilterValue() as string) ?? ''}
               onChange={(event) =>
                 table.getColumn(searchableColumns[0].id)?.setFilterValue(event.target.value)
               }
@@ -60,4 +60,4 @@ export function DataTableToolbar<TData>({
       )}
     </div>
   )
-} 
+}

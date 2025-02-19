@@ -5,16 +5,14 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import {
-  SidebarTrigger
-} from "@/components/ui/sidebar"
-import { Home } from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Fragment } from "react"
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Home } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Fragment } from 'react'
 
 const MainNavbar = () => {
   const pathname = usePathname()
@@ -48,9 +46,7 @@ const MainNavbar = () => {
                       </BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink asChild>
-                        <Link href={href}>
-                          {part.charAt(0).toUpperCase() + part.slice(1)}
-                        </Link>
+                        <Link href={href}>{part.charAt(0).toUpperCase() + part.slice(1)}</Link>
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>

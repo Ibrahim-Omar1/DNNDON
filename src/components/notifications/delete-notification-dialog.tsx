@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import {
   AlertDialog,
@@ -9,8 +9,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { useDeleteNotification } from "@/hooks/use-notifications"
+} from '@/components/ui/alert-dialog'
+import { useDeleteNotification } from '@/hooks/use-notifications'
 
 interface DeleteNotificationDialogProps {
   notificationId: string
@@ -39,8 +39,8 @@ export function DeleteNotificationDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the
-            notification from our servers.
+            This action cannot be undone. This will permanently delete the notification from our
+            servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -50,10 +50,10 @@ export function DeleteNotificationDialog({
             disabled={isPending}
             className="bg-destructive hover:bg-destructive/90"
           >
-            {isPending ? "Deleting..." : "Delete"}
+            {isPending ? 'Deleting...' : 'Delete'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   )
-} 
+}

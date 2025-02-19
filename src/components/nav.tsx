@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import {
   ChevronRight,
@@ -7,20 +7,16 @@ import {
   MoreHorizontal,
   Trash2,
   type LucideIcon,
-} from "lucide-react"
+} from 'lucide-react'
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarGroup,
   SidebarMenu,
@@ -31,8 +27,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from '@/components/ui/sidebar'
+import Link from 'next/link'
 
 export interface NavItem {
   title?: string
@@ -99,7 +95,9 @@ export function Nav({ items, hideProjectsOnCollapse = false }: NavProps) {
           return (
             <SidebarMenuItem
               key={displayName}
-              className={isProject && hideProjectsOnCollapse ? "group-data-[collapsible=icon]:hidden" : ""}
+              className={
+                isProject && hideProjectsOnCollapse ? 'group-data-[collapsible=icon]:hidden' : ''
+              }
             >
               <SidebarMenuButton asChild>
                 <Link href={item.url}>
@@ -117,8 +115,8 @@ export function Nav({ items, hideProjectsOnCollapse = false }: NavProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     className="w-48 rounded-lg"
-                    side={isMobile ? "bottom" : "right"}
-                    align={isMobile ? "end" : "start"}
+                    side={isMobile ? 'bottom' : 'right'}
+                    align={isMobile ? 'end' : 'start'}
                   >
                     <DropdownMenuItem>
                       <Folder className="text-muted-foreground" />
@@ -142,4 +140,4 @@ export function Nav({ items, hideProjectsOnCollapse = false }: NavProps) {
       </SidebarMenu>
     </SidebarGroup>
   )
-} 
+}
