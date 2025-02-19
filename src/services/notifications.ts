@@ -127,19 +127,23 @@ const updateNotification = async (
   id: string,
   data: Partial<Notification>
 ): Promise<Notification> => {
-  const response = await fetch(`/api/notifications/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
+  try {
+    const response = await fetch(`/api/notifications?id=${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
 
-  if (!response.ok) {
-    throw new Error('Failed to update notification')
+    if (!response.ok) {
+      throw new Error('Failed to update notification')
+    }
+
+    return response.json()
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : 'Failed to update notification')
   }
-
-  return response.json()
 }
 
 export { addNotification, deleteNotification, getNotifications, updateNotification }

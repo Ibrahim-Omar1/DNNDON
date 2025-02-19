@@ -7,12 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { type Notification } from '@/types/notifications.types'
 import { ColumnDef, Row } from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash } from 'lucide-react'
 import { useState } from 'react'
+import ColumnHeaderOptions from './ColumnHeaderOptions'
 import { DeleteNotificationDialog } from './delete-notification-dialog'
 import { EditNotificationModal } from './edit-notification-modal'
-import { type Notification } from '@/types/notifications.types'
 
 export const columns: ColumnDef<Notification>[] = [
   {
@@ -25,65 +26,32 @@ export const columns: ColumnDef<Notification>[] = [
   },
   {
     accessorKey: 'type',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className="flex items-center gap-1"
-        >
-          Notification Type
-          {column.getIsSorted() === 'asc' ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : column.getIsSorted() === 'desc' ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="h-4 w-4" />
-          )}
-        </Button>
-      )
-    },
+    header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'space',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className="flex items-center gap-1"
-        >
-          Notification Space
-          {column.getIsSorted() === 'asc' ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : column.getIsSorted() === 'desc' ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="h-4 w-4" />
-          )}
-        </Button>
-      )
-    },
+    header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'country',
-    header: 'Country',
+    header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'city',
-    header: 'City',
+    header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'dateTime',
-    header: 'Date & Time',
+    header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
-    id: 'status',
-    header: 'Status',
+    accessorKey: 'status',
+    header: ({ column }) => <ColumnHeaderOptions column={column} />,
     cell: StatusCell,
   },
   {
     id: 'actions',
+    header: 'Actions',
     cell: ActionsCell,
   },
 ]
@@ -94,12 +62,11 @@ function StatusCell({ row }: { row: Row<Notification> }) {
     <span
       className={`
         inline-flex rounded-full px-3 py-1 text-xs font-medium
-        ${
-          status === 'Delivered'
-            ? 'bg-green-50 text-green-600'
-            : status === 'In Progress'
-              ? 'bg-yellow-50 text-yellow-600'
-              : 'bg-red-50 text-red-500'
+        ${status === 'Delivered'
+          ? 'bg-green-50 text-green-600'
+          : status === 'In Progress'
+            ? 'bg-yellow-50 text-yellow-600'
+            : 'bg-red-50 text-red-500'
         }
       `}
     >

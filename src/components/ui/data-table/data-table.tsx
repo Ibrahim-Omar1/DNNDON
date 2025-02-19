@@ -10,13 +10,15 @@ import {
 } from '@/components/ui/table'
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableToolbar } from './data-table-toolbar'
 
@@ -103,11 +105,14 @@ export function DataTable<TData, TValue>({
   loading = false,
   pagination,
 }: DataTableProps<TData, TValue>) {
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
     pageCount: pagination ? Math.ceil(pagination.total / pagination.pageSize) : undefined,
     onPaginationChange: (updater) => {
@@ -125,7 +130,9 @@ export function DataTable<TData, TValue>({
         pageSize: pagination?.pageSize || 10,
         pageIndex: (pagination?.page || 1) - 1,
       },
+      columnFilters,
     },
+    onColumnFiltersChange: setColumnFilters,
     filterFns: {
       contains: (row, columnId, filterValue) => {
         const value = row.getValue(columnId) as string
