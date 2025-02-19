@@ -31,27 +31,31 @@ A modern admin dashboard built with Next.js 14, TypeScript, and Shadcn UI.
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm (recommended) or npm
 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/your-repo-name.git
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 3. Create a `.env.local` file:
+
 ```env
 # Your environment variables
 ```
 
 4. Start the development server:
+
 ```bash
 pnpm dev
 ```
@@ -76,6 +80,7 @@ src/
 ### Data Table
 
 A flexible data table component with:
+
 - Server-side pagination
 - URL state management
 - Fixed height states

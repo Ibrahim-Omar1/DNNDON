@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
 import { type Notification } from '@/types/notifications.types'
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -9,25 +9,25 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useUpdateNotification } from "@/hooks/use-notifications"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+} from '@/components/ui/select'
+import { useUpdateNotification } from '@/hooks/use-notifications'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 const notificationSchema = z.object({
-  type: z.enum(["Photo", "Text"]),
+  type: z.enum(['Photo', 'Text']),
   space: z.string().min(1),
   country: z.string().min(1),
   city: z.string().min(1),
-  status: z.enum(["Delivered", "In Progress", "Cancelled"]),
+  status: z.enum(['Delivered', 'In Progress', 'Cancelled']),
   // id and dateTime are handled separately
 })
 
@@ -75,18 +75,14 @@ export function EditNotificationModal({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Edit Notification</DialogTitle>
-            <DialogDescription>
-              Update the notification details below.
-            </DialogDescription>
+            <DialogDescription>Update the notification details below.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="type">Type</label>
               <Select
-                value={form.watch("type")}
-                onValueChange={(value: "Photo" | "Text") =>
-                  form.setValue("type", value)
-                }
+                value={form.watch('type')}
+                onValueChange={(value: 'Photo' | 'Text') => form.setValue('type', value)}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue />
@@ -101,9 +97,9 @@ export function EditNotificationModal({
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="status">Status</label>
               <Select
-                value={form.watch("status")}
-                onValueChange={(value: "Delivered" | "In Progress" | "Cancelled") =>
-                  form.setValue("status", value)
+                value={form.watch('status')}
+                onValueChange={(value: 'Delivered' | 'In Progress' | 'Cancelled') =>
+                  form.setValue('status', value)
                 }
               >
                 <SelectTrigger className="col-span-3">
@@ -118,15 +114,12 @@ export function EditNotificationModal({
             </div>
           </div>
           <DialogFooter>
-            <Button
-              type="submit"
-              disabled={isPending}
-            >
-              {isPending ? "Saving..." : "Save Changes"}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   )
-} 
+}

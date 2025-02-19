@@ -14,8 +14,8 @@ A flexible data table component built on top of TanStack Table v8 with server-si
 ## Usage
 
 ```tsx
-import { DataTable } from "@/components/ui/data-table/data-table"
-import { columns } from "./columns"
+import { DataTable } from '@/components/ui/data-table/data-table'
+import { columns } from './columns'
 
 interface DataTableProps {
   data: YourDataType[]
@@ -30,14 +30,7 @@ interface DataTableProps {
 }
 
 export function YourDataTable({ data, loading, pagination }: DataTableProps) {
-  return (
-    <DataTable
-      columns={columns}
-      data={data}
-      loading={loading}
-      pagination={pagination}
-    />
-  )
+  return <DataTable columns={columns} data={data} loading={loading} pagination={pagination} />
 }
 ```
 
@@ -45,12 +38,12 @@ export function YourDataTable({ data, loading, pagination }: DataTableProps) {
 
 ### Root Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `columns` | `ColumnDef<TData, TValue>[]` | Column definitions for the table |
-| `data` | `TData[]` | Data to display in the table |
-| `loading` | `boolean` | Loading state of the table |
-| `pagination` | `PaginationConfig` | Pagination configuration |
+| Prop         | Type                         | Description                      |
+| ------------ | ---------------------------- | -------------------------------- |
+| `columns`    | `ColumnDef<TData, TValue>[]` | Column definitions for the table |
+| `data`       | `TData[]`                    | Data to display in the table     |
+| `loading`    | `boolean`                    | Loading state of the table       |
+| `pagination` | `PaginationConfig`           | Pagination configuration         |
 
 ### Pagination Config
 
@@ -69,26 +62,26 @@ interface PaginationConfig {
 ### Basic Server-Side Pagination
 
 ```tsx
-import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { DataTable } from "@/components/ui/data-table/data-table"
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { DataTable } from '@/components/ui/data-table/data-table'
 
 export function ExampleTable() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  
-  const page = Number(searchParams.get("page")) || 1
-  const limit = Number(searchParams.get("limit")) || 10
+
+  const page = Number(searchParams.get('page')) || 1
+  const limit = Number(searchParams.get('limit')) || 10
 
   const { data, isLoading } = useQuery({
     queryKey: ['data', page, limit],
-    queryFn: () => fetchData({ page, limit })
+    queryFn: () => fetchData({ page, limit }),
   })
 
   const createQueryString = useCallback(
     (params: Record<string, string | number>) => {
       const newSearchParams = new URLSearchParams(searchParams.toString())
-      
+
       Object.entries(params).forEach(([key, value]) => {
         if (value === null) {
           newSearchParams.delete(key)
@@ -96,7 +89,7 @@ export function ExampleTable() {
           newSearchParams.set(key, String(value))
         }
       })
-      
+
       return newSearchParams.toString()
     },
     [searchParams]
@@ -104,20 +97,16 @@ export function ExampleTable() {
 
   const handlePageChange = useCallback(
     (newPage: number) => {
-      router.push(
-        `${pathname}?${createQueryString({ page: newPage, limit })}`,
-        { scroll: false }
-      )
+      router.push(`${pathname}?${createQueryString({ page: newPage, limit })}`, { scroll: false })
     },
     [router, pathname, limit, createQueryString]
   )
 
   const handleLimitChange = useCallback(
     (newLimit: number) => {
-      router.push(
-        `${pathname}?${createQueryString({ page: 1, limit: newLimit })}`,
-        { scroll: false }
-      )
+      router.push(`${pathname}?${createQueryString({ page: 1, limit: newLimit })}`, {
+        scroll: false,
+      })
     },
     [router, pathname, createQueryString]
   )
@@ -142,6 +131,7 @@ export function ExampleTable() {
 ### Fixed Height Loading State
 
 The table maintains a fixed height of 400px in all states:
+
 - Loading spinner during data fetch
 - Data display when loaded
 - Empty state message when no results
@@ -177,9 +167,7 @@ The loading spinner can be customized by modifying the SVG in the DataTable comp
 
 ```tsx
 <div className="flex items-center justify-center h-full">
-  <svg className="animate-spin h-6 w-6 text-muted-foreground">
-    {/* Your custom spinner SVG */}
-  </svg>
+  <svg className="animate-spin h-6 w-6 text-muted-foreground">{/* Your custom spinner SVG */}</svg>
 </div>
 ```
 
@@ -189,4 +177,4 @@ The loading spinner can be customized by modifying the SVG in the DataTable comp
 - Page size changes reset to page 1
 - The table maintains its state between route changes
 - Loading states maintain consistent layout
-- Row numbers are calculated based on current page and page size 
+- Row numbers are calculated based on current page and page size

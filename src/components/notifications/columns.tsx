@@ -1,45 +1,41 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { ColumnDef, Row } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash } from "lucide-react"
-import { useState } from "react"
-import { DeleteNotificationDialog } from "./delete-notification-dialog"
-import { EditNotificationModal } from "./edit-notification-modal"
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ColumnDef, Row } from '@tanstack/react-table'
+import { ArrowUpDown, ChevronDown, ChevronUp, MoreHorizontal, Pencil, Trash } from 'lucide-react'
+import { useState } from 'react'
+import { DeleteNotificationDialog } from './delete-notification-dialog'
+import { EditNotificationModal } from './edit-notification-modal'
 import { type Notification } from '@/types/notifications.types'
 
 export const columns: ColumnDef<Notification>[] = [
   {
-    id: "number",
-    header: "#",
+    id: 'number',
+    header: '#',
     cell: ({ row }) => {
-      return (
-        <div className="text-sm text-muted-foreground w-10">
-          {row.index + 1}
-        </div>
-      )
+      return <div className="text-sm text-muted-foreground w-10">{row.index + 1}</div>
     },
     enableSorting: false,
   },
   {
-    accessorKey: "type",
+    accessorKey: 'type',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="flex items-center gap-1"
         >
           Notification Type
-          {column.getIsSorted() === "asc" ? (
+          {column.getIsSorted() === 'asc' ? (
             <ChevronUp className="h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
+          ) : column.getIsSorted() === 'desc' ? (
             <ChevronDown className="h-4 w-4" />
           ) : (
             <ArrowUpDown className="h-4 w-4" />
@@ -49,18 +45,18 @@ export const columns: ColumnDef<Notification>[] = [
     },
   },
   {
-    accessorKey: "space",
+    accessorKey: 'space',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="flex items-center gap-1"
         >
           Notification Space
-          {column.getIsSorted() === "asc" ? (
+          {column.getIsSorted() === 'asc' ? (
             <ChevronUp className="h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
+          ) : column.getIsSorted() === 'desc' ? (
             <ChevronDown className="h-4 w-4" />
           ) : (
             <ArrowUpDown className="h-4 w-4" />
@@ -70,39 +66,40 @@ export const columns: ColumnDef<Notification>[] = [
     },
   },
   {
-    accessorKey: "country",
-    header: "Country",
+    accessorKey: 'country',
+    header: 'Country',
   },
   {
-    accessorKey: "city",
-    header: "City",
+    accessorKey: 'city',
+    header: 'City',
   },
   {
-    accessorKey: "dateTime",
-    header: "Date & Time",
+    accessorKey: 'dateTime',
+    header: 'Date & Time',
   },
   {
-    id: "status",
-    header: "Status",
-    cell: StatusCell
+    id: 'status',
+    header: 'Status',
+    cell: StatusCell,
   },
   {
-    id: "actions",
-    cell: ActionsCell
-  }
+    id: 'actions',
+    cell: ActionsCell,
+  },
 ]
 
 function StatusCell({ row }: { row: Row<Notification> }) {
-  const status = row.getValue("status") as string
+  const status = row.getValue('status') as string
   return (
     <span
       className={`
         inline-flex rounded-full px-3 py-1 text-xs font-medium
-        ${status === "Delivered"
-          ? "bg-green-50 text-green-600"
-          : status === "In Progress"
-            ? "bg-yellow-50 text-yellow-600"
-            : "bg-red-50 text-red-500"
+        ${
+          status === 'Delivered'
+            ? 'bg-green-50 text-green-600'
+            : status === 'In Progress'
+              ? 'bg-yellow-50 text-yellow-600'
+              : 'bg-red-50 text-red-500'
         }
       `}
     >
@@ -153,4 +150,4 @@ function ActionsCell({ row }: { row: Row<Notification> }) {
       />
     </>
   )
-} 
+}

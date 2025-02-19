@@ -16,4 +16,4 @@ export interface NotificationResponse {
     pageSize: number
     totalCount: number
   }
-} 
+}

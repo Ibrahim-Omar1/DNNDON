@@ -15,9 +15,9 @@ module.exports = {
         'chore',
         'revert',
         'ci',
-        'build'
-      ]
+        'build',
+      ],
     ],
-    'subject-case': [0]
-  }
-}; 
+    'subject-case': [0],
+  },
+}

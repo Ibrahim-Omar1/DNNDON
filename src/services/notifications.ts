@@ -1,4 +1,4 @@
-import { type Notification } from "@/types/notifications.types"
+import { type Notification } from '@/types/notifications.types'
 
 /**
  * Response type for notifications API
@@ -43,11 +43,11 @@ export interface FetchNotificationsParams {
 
 /**
  * Fetches notifications from the API with filtering, pagination, and sorting
- * 
+ *
  * @param params - Query parameters for filtering, pagination, and sorting
  * @returns Promise with notifications data and metadata
  * @throws Error if the API request fails
- * 
+ *
  * @example
  * ```ts
  * // Fetch first page of delivered notifications
@@ -58,42 +58,40 @@ export interface FetchNotificationsParams {
  * })
  * ```
  */
-export async function getNotifications(params: FetchNotificationsParams = {}): Promise<NotificationsResponse> {
+export async function getNotifications(
+  params: FetchNotificationsParams = {}
+): Promise<NotificationsResponse> {
   const searchParams = new URLSearchParams()
-  
+
   // Add pagination params
-  if (params.page) searchParams.append("page", params.page.toString())
-  if (params.limit) searchParams.append("limit", params.limit.toString())
+  if (params.page) searchParams.append('page', params.page.toString())
+  if (params.limit) searchParams.append('limit', params.limit.toString())
 
   try {
     const response = await fetch(`/api/notifications?${searchParams.toString()}`)
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     return response.json()
   } catch (error) {
-    throw new Error(
-      error instanceof Error 
-        ? error.message 
-        : "Failed to fetch notifications"
-    )
+    throw new Error(error instanceof Error ? error.message : 'Failed to fetch notifications')
   }
 }
 
 /**
  * Query key factory for notifications
  */
-export const notificationsQueryKey = (params: FetchNotificationsParams = {}) => 
-  ['notifications', params] as const 
+export const notificationsQueryKey = (params: FetchNotificationsParams = {}) =>
+  ['notifications', params] as const
 
 export async function addNotification(data: Partial<Notification>): Promise<Notification> {
   try {
-    const response = await fetch("/api/notifications", {
-      method: "POST",
+    const response = await fetch('/api/notifications', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     })
@@ -104,11 +102,7 @@ export async function addNotification(data: Partial<Notification>): Promise<Noti
 
     return response.json()
   } catch (error) {
-    throw new Error(
-      error instanceof Error 
-        ? error.message 
-        : "Failed to add notification"
-    )
+    throw new Error(error instanceof Error ? error.message : 'Failed to add notification')
   }
 }
 
@@ -122,7 +116,10 @@ export async function deleteNotification(id: string): Promise<void> {
   }
 }
 
-export async function updateNotification(id: string, data: Partial<Notification>): Promise<Notification> {
+export async function updateNotification(
+  id: string,
+  data: Partial<Notification>
+): Promise<Notification> {
   const response = await fetch(`/api/notifications?id=${id}`, {
     method: 'PUT',
     headers: {
@@ -136,4 +133,4 @@ export async function updateNotification(id: string, data: Partial<Notification>
   }
 
   return response.json()
-} 
+}

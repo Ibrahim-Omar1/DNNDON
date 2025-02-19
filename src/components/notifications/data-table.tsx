@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -22,23 +22,20 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
-  useReactTable
-} from "@tanstack/react-table"
-import { Download, Printer, Search } from "lucide-react"
-import { useState } from "react"
+  useReactTable,
+} from '@tanstack/react-table'
+import { Download, Printer, Search } from 'lucide-react'
+import { useState } from 'react'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = useState("")
+  const [globalFilter, setGlobalFilter] = useState('')
 
   const table = useReactTable({
     data,
@@ -99,10 +96,8 @@ export function DataTable<TData, TValue>({
             </div>
             <Input
               placeholder="Filter countries..."
-              value={(table.getColumn("country")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("country")?.setFilterValue(event.target.value)
-              }
+              value={(table.getColumn('country')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('country')?.setFilterValue(event.target.value)}
               className="h-9 w-[150px] bg-gray-50/50 border-gray-200 focus-visible:ring-gray-200"
             />
           </div>
@@ -121,10 +116,7 @@ export function DataTable<TData, TValue>({
                       <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
-                          : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
                     )
                   })}
@@ -136,10 +128,10 @@ export function DataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
+                    data-state={row.getIsSelected() && 'selected'}
                     className={`
                       hover:bg-gray-50 transition-colors
-                      ${row.index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}
+                      ${row.index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}
                     `}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -181,4 +173,4 @@ export function DataTable<TData, TValue>({
       </div>
     </div>
   )
-} 
+}

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import {
   Table,
@@ -7,16 +7,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table'
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  useReactTable
-} from "@tanstack/react-table"
-import { useEffect } from "react"
-import { DataTablePagination } from "./data-table-pagination"
+  useReactTable,
+} from '@tanstack/react-table'
+import { useEffect } from 'react'
+import { DataTablePagination } from './data-table-pagination'
 
 /**
  * Props for configurable columns in the DataTable
@@ -104,10 +104,10 @@ const containsFilter = (value: string, filterValue: string): boolean => {
 
 /**
  * A flexible and feature-rich data table component
- * 
+ *
  * @template TData - Type of the data array
  * @template TValue - Type of the cell values
- * 
+ *
  * @example
  * ```tsx
  * <DataTable
@@ -162,8 +162,8 @@ export function DataTable<TData, TValue>({
       contains: (row, columnId, filterValue) => {
         const value = row.getValue(columnId) as string
         return containsFilter(value, filterValue)
-      }
-    }
+      },
+    },
   })
 
   // Force update table state when URL params change
@@ -183,10 +183,7 @@ export function DataTable<TData, TValue>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -195,10 +192,7 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-[400px] text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-[400px] text-center">
                   <div className="flex items-center justify-center h-full">
                     <svg
                       className="animate-spin h-6 w-6 text-muted-foreground"
@@ -225,16 +219,10 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -242,10 +230,7 @@ export function DataTable<TData, TValue>({
             ) : (
               // Empty state
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-[400px] text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-[400px] text-center">
                   <div className="flex flex-col items-center justify-center h-full space-y-1">
                     <div className="text-muted-foreground">No results.</div>
                   </div>
@@ -255,10 +240,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination
-        table={table}
-        totalRows={pagination?.total}
-      />
+      <DataTablePagination table={table} totalRows={pagination?.total} />
     </div>
   )
-} 
+}
