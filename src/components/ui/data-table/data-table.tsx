@@ -43,12 +43,6 @@ interface PaginationConfig {
   onSort?: (column: string, order: 'asc' | 'desc') => void
 }
 
-interface CustomSorting {
-  column?: string
-  order?: 'asc' | 'desc'
-  onSort: (column: string, order: 'asc' | 'desc') => void
-}
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]

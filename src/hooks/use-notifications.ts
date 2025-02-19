@@ -6,13 +6,7 @@ import {
   NotificationsResponse,
   updateNotification,
 } from '@/services/notifications'
-import {
-  useMutation,
-  UseMutationResult,
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 /**
