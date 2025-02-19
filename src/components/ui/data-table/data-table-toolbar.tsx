@@ -13,7 +13,7 @@ interface DataTableToolbarProps<TData> {
     id: string
     title: string
   }[]
-  filterableColumns?: DataTableFilterableColumn[]
+  filterableColumns?: any[]
 }
 
 export function DataTableToolbar<TData>({
