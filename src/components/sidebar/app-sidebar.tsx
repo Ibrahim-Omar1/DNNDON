@@ -3,8 +3,8 @@
 import { Bell, Home } from 'lucide-react'
 import * as React from 'react'
 
-import { Nav, NavItem } from '@/components/nav'
-import { NavUser } from '@/components/nav-user'
+import { Nav, NavItem } from '@/components/sidebar/nav'
+import { NavUser } from '@/components/sidebar/nav-user'
 import {
   Sidebar,
   SidebarContent,

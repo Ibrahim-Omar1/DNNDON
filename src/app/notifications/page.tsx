@@ -1,4 +1,4 @@
-import { NotificationTable } from '@/components/notification-table'
+import { NotificationTable } from '@/components/notifications/notification-table'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

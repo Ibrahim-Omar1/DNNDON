@@ -35,14 +35,6 @@ interface FilterableColumn extends ColumnConfig {
   }[]
 }
 
-interface PaginationConfig {
-  page: number
-  pageSize: number
-  total: number
-  onPageChange: (page: number) => void
-  onPageSizeChange: (pageSize: number) => void
-  onSort?: (column: string, order: 'asc' | 'desc') => void
-}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

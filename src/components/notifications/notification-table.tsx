@@ -6,8 +6,8 @@ import { useNotifications } from '@/hooks/use-notifications'
 import { Plus, RefreshCcw } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { AddNotificationModal } from './notifications/add-notification-modal'
-import { columns } from './notifications/columns'
+import { AddNotificationModal } from './add-notification-modal'
+import { columns } from './columns'
 
 /**
  * NotificationTable Component

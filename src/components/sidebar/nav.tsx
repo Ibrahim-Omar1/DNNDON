@@ -13,8 +13,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  useSidebar
+  SidebarMenuSubItem
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
 
@@ -36,7 +35,7 @@ interface NavProps {
 }
 
 export function Nav({ items, hideProjectsOnCollapse = false }: NavProps) {
-  const { isMobile } = useSidebar()
+  // const { isMobile } = useSidebar()
 
   return (
     <SidebarGroup>
