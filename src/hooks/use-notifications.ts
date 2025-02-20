@@ -64,13 +64,13 @@ const useGetCachedNotifications = (): NotificationsResponse | undefined => {
   const queryClient = useQueryClient()
   const data = queryClient.getQueryData<NotificationsResponse>(['notifications'])
 
-  if (!data) {
-    const { data: newData } = useNotifications({
-      page: 1,
-      limit: 10,
-    })
-    return newData
-  }
+  // if (!data) {
+  //   const { data: newData } = useNotifications({
+  //     page: 1,
+  //     limit: 10,
+  //   })
+  //   return newData
+  // }
 
   return data
 }

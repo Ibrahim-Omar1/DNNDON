@@ -19,10 +19,7 @@ const Page = async ({ searchParams }: PageProps) => {
 
   return (
     <>
-      <NotificationTable
-        initialPage={Number(page ?? 1)}
-        initialLimit={Number(limit ?? 10)}
-      />
+      <NotificationTable initialPage={Number(page ?? 1)} initialLimit={Number(limit ?? 10)} />
     </>
   )
 }

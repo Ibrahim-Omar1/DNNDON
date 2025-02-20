@@ -30,7 +30,13 @@ import { columns } from './columns'
  * ```
  */
 
-export function NotificationTable({ initialPage = 1, initialLimit = 10 }: { initialPage?: number, initialLimit?: number }) {
+export function NotificationTable({
+  initialPage = 1,
+  initialLimit = 10,
+}: {
+  initialPage?: number
+  initialLimit?: number
+}) {
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page')) || initialPage
   const limit = Number(searchParams.get('limit')) || initialLimit
@@ -58,13 +64,11 @@ export function NotificationTable({ initialPage = 1, initialLimit = 10 }: { init
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            Total Notifications: <span className="flex items-center gap-2">
-              {data?.metadata?.totalCount ?? <RefreshCcw
-                className={cn(
-                  'h-4 w-4',
-                  isFetching ? 'animate-spin' : ''
-                )}
-              />}
+            Total Notifications:{' '}
+            <span className="flex items-center gap-2">
+              {data?.metadata?.totalCount ?? (
+                <RefreshCcw className={cn('h-4 w-4', isFetching ? 'animate-spin' : '')} />
+              )}
             </span>
           </h1>
         </div>
@@ -76,12 +80,7 @@ export function NotificationTable({ initialPage = 1, initialLimit = 10 }: { init
             disabled={isFetching}
             className="gap-2 min-w-[130px]"
           >
-            <RefreshCcw
-              className={cn(
-                'h-4 w-4',
-                isFetching ? 'animate-spin' : ''
-              )}
-            />
+            <RefreshCcw className={cn('h-4 w-4', isFetching ? 'animate-spin' : '')} />
             {isFetching ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button size="sm" onClick={() => setAddModalOpen(true)} className="gap-2">
