@@ -56,13 +56,6 @@ interface DataTableProps<TData, TValue> {
 }
 
 /**
- * Case-insensitive filter function for global search
- */
-const containsFilter = (value: string, filterValue: string): boolean => {
-  return value.toLowerCase().includes(filterValue.toLowerCase())
-}
-
-/**
  * A flexible and feature-rich data table component
  *
  * @template TData - Type of the data array
