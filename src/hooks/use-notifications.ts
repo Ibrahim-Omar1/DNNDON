@@ -10,55 +10,28 @@ import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack
 import { toast } from 'sonner'
 
 /**
- * Parameters for fetching notifications
- * @interface UseNotificationsParams
- */
-interface UseNotificationsParams {
-  /** Search query string to filter notifications */
-  query?: string
-  /** Filter notifications by status */
-  status?: string
-  /** Filter notifications by type */
-  type?: string
-  /** Current page number for pagination */
-  page?: number
-  /** Number of items per page */
-  limit?: number
-  /** Column to sort by */
-  sort?: string
-  /** Sort direction */
-  order?: 'asc' | 'desc'
-}
-
-/**
- * Custom hook for fetching notifications with filtering, sorting, and pagination
+ * Custom hook for fetching notifications with pagination
  *
  * Uses TanStack Query for data fetching, caching, and state management.
- * Implements server-side filtering, sorting, and pagination.
+ * Implements server-side pagination.
  *
- * @param {UseNotificationsParams} params - Query parameters for filtering, sorting, and pagination
+ * @param {UseNotificationsParams} params - Query parameters for pagination
+ * @param {number} params.page - Current page number for pagination
+ * @param {number} params.limit - Number of items per page
  *
  * @example
  * ```tsx
  * // Basic usage
  * const { data, isLoading } = useNotifications()
  *
- * // With filters and pagination
+ * // With and pagination
  * const { data, isLoading } = useNotifications({
- *   query: "search term",
- *   status: "Delivered",
  *   page: 1,
  *   limit: 10
  * })
- *
- * // With sorting
- * const { data, isLoading } = useNotifications({
- *   sort: "dateTime",
- *   order: "desc"
- * })
  * ```
  *
- * @returns {UseQueryResult} Query result object containing:
+ * @returns Query result object containing:
  * - data: NotificationsResponse object with notifications and metadata
  * - isLoading: Boolean indicating initial loading state
  * - isFetching: Boolean indicating background refetch state
@@ -66,9 +39,10 @@ interface UseNotificationsParams {
  * - error: Error object if query failed
  * - refetch: Function to manually refetch data
  */
-const useNotifications = (
-  params: UseNotificationsParams = {}
-): UseQueryResult<NotificationsResponse, Error> => {
+const useNotifications = (params: {
+  page?: number
+  limit?: number
+}): UseQueryResult<NotificationsResponse, Error> => {
   return useQuery({
     queryKey: notificationsQueryKey(params),
     queryFn: () => getNotifications(params),
@@ -76,6 +50,29 @@ const useNotifications = (
     refetchOnWindowFocus: false,
     placeholderData: (prev) => prev, // Add this to keep previous data while loading new data
   })
+}
+
+/**
+ * Custom hook to get cached notifications data.
+ *
+ * This hook attempts to retrieve notification data from the TanStack Query cache.
+ * If the data is not available in the cache, it fetches the data using the `useNotifications` hook.
+ *
+ * @returns {NotificationsResponse | undefined} The cached notification data, or undefined if not available.
+ */
+const useGetCachedNotifications = (): NotificationsResponse | undefined => {
+  const queryClient = useQueryClient()
+  const data = queryClient.getQueryData<NotificationsResponse>(['notifications'])
+
+  if (!data) {
+    const { data: newData } = useNotifications({
+      page: 1,
+      limit: 10,
+    })
+    return newData
+  }
+
+  return data
 }
 
 /**
@@ -97,7 +94,7 @@ const useNotifications = (
  * })
  * ```
  *
- * @returns {UseMutationResult} Mutation result object containing:
+ * @returns  Mutation result object containing:
  * - mutate: Function to trigger the mutation
  * - isPending: Boolean indicating loading state
  * - isError: Boolean indicating error state
@@ -128,7 +125,7 @@ const useAddNotification = () => {
  * deleteNotification("notification-id")
  * ```
  *
- * @returns {UseMutationResult} Mutation result object containing:
+ * @returns  Mutation result object containing:
  * - mutate: Function to trigger the deletion
  * - isPending: Boolean indicating loading state
  * - isError: Boolean indicating error state
@@ -190,4 +187,10 @@ const useUpdateNotification = () => {
   })
 }
 
-export { useAddNotification, useDeleteNotification, useNotifications, useUpdateNotification }
+export {
+  useAddNotification,
+  useDeleteNotification,
+  useGetCachedNotifications,
+  useNotifications,
+  useUpdateNotification,
+}
