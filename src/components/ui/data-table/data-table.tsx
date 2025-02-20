@@ -14,12 +14,12 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableToolbar } from './data-table-toolbar'
 
@@ -50,7 +50,9 @@ interface DataTableProps<TData, TValue> {
   searchableColumns?: ColumnConfig[]
   filterableColumns?: FilterableColumn[]
   loading?: boolean
-  pagination?: PaginationConfig
+  totalCount: number
+  onRefresh?: () => void
+  isRefetching?: boolean
 }
 
 /**
@@ -93,62 +95,96 @@ export function DataTable<TData, TValue>({
   searchableColumns,
   filterableColumns,
   loading = false,
-  pagination,
+  totalCount,
+  onRefresh,
+  isRefetching,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = useState({})
+
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Get pagination values from URL
+  const page = Number(searchParams.get('page')) || 1
+  const pageSize = Number(searchParams.get('limit')) || 10
+
+  // Create URL updater function
+  const createQueryString = useCallback(
+    (params: Record<string, string | number>) => {
+      const newSearchParams = new URLSearchParams(searchParams.toString())
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === null) {
+          newSearchParams.delete(key)
+        } else {
+          newSearchParams.set(key, String(value))
+        }
+      })
+
+      return newSearchParams.toString()
+    },
+    [searchParams]
+  )
+
+  // Update URL when pagination changes
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      router.push(
+        `${pathname}?${createQueryString({ page: newPage, limit: pageSize })}`,
+        { scroll: false }
+      )
+    },
+    [router, pathname, pageSize, createQueryString]
+  )
+
+  const handlePageSizeChange = useCallback(
+    (newPageSize: number) => {
+      router.push(
+        `${pathname}?${createQueryString({ page: 1, limit: newPageSize })}`,
+        { scroll: false }
+      )
+    },
+    [router, pathname, createQueryString]
+  )
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
-    pageCount: pagination ? Math.ceil(pagination.total / pagination.pageSize) : undefined,
-    onPaginationChange: (updater) => {
-      const state = typeof updater === 'function' ? updater(table.getState().pagination) : updater
-
-      if (pagination?.onPageChange) {
-        pagination.onPageChange(state.pageIndex + 1)
-      }
-      if (pagination?.onPageSizeChange) {
-        pagination.onPageSizeChange(state.pageSize)
-      }
-    },
+    pageCount: Math.ceil(totalCount / pageSize),
     state: {
       pagination: {
-        pageSize: pagination?.pageSize || 10,
-        pageIndex: (pagination?.page ? pagination.page - 1 : 0),
+        pageSize,
+        pageIndex: page - 1,
       },
       columnFilters,
       rowSelection,
     },
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
-    filterFns: {
-      contains: (row, columnId, filterValue) => {
-        const value = row.getValue(columnId)
-        return value != null
-          ? String(value).toLowerCase().includes(String(filterValue).toLowerCase())
-          : false
-      },
+    onPaginationChange: (updater) => {
+      const state = typeof updater === 'function' ? updater(table.getState().pagination) : updater
+      handlePageChange(state.pageIndex + 1)
+      if (state.pageSize !== pageSize) {
+        handlePageSizeChange(state.pageSize)
+      }
     },
   })
 
   // Force update table state when pagination props change
   useEffect(() => {
-    if (pagination) {
-      // Don't update the table state if it matches the pagination props
-      if (table.getState().pagination.pageIndex !== pagination.page - 1) {
-        table.setPageIndex(pagination.page - 1)
-      }
-      if (table.getState().pagination.pageSize !== pagination.pageSize) {
-        table.setPageSize(pagination.pageSize)
-      }
+    if (table.getState().pagination.pageIndex !== page - 1) {
+      table.setPageIndex(page - 1)
     }
-  }, [pagination?.page, pagination?.pageSize, table])
+    if (table.getState().pagination.pageSize !== pageSize) {
+      table.setPageSize(pageSize)
+    }
+  }, [page, pageSize, table])
 
   return (
     <div className="space-y-4">
@@ -156,6 +192,9 @@ export function DataTable<TData, TValue>({
         table={table}
         searchableColumns={searchableColumns}
         filterableColumns={filterableColumns}
+        totalCount={totalCount}
+        onRefresh={onRefresh}
+        isRefetching={isRefetching}
       />
       <div className="rounded-md border">
         <Table>
@@ -204,7 +243,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} totalRows={pagination?.total} />
+      <DataTablePagination table={table} totalRows={totalCount} />
     </div>
   )
 }

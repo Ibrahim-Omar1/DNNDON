@@ -33,6 +33,10 @@ export function DataTablePagination<TData>({ table, totalRows }: DataTablePagina
   const canPreviousPage = pageIndex > 0
   const canNextPage = pageIndex < totalPages - 1
 
+  // Calculate start and end row numbers
+  const startRow = Math.min(pageIndex * pageSize + 1, total)
+  const endRow = Math.min((pageIndex + 1) * pageSize, total)
+
   const createQueryString = (params: Record<string, string | number>) => {
     const newSearchParams = new URLSearchParams(searchParams.toString())
     Object.entries(params).forEach(([key, value]) => {
@@ -45,10 +49,7 @@ export function DataTablePagination<TData>({ table, totalRows }: DataTablePagina
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
         {total > 0
-          ? `Showing ${pageIndex * pageSize + 1} to ${Math.min(
-            (pageIndex + 1) * pageSize,
-            total
-          )} of ${total} results`
+          ? `Showing ${startRow} to ${endRow} of ${total} results`
           : 'No results.'}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
