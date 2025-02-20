@@ -1,152 +1,14 @@
-import { type Notification, type NotificationResponse } from '@/types/notifications.types'
-import { revalidateTag } from 'next/cache'
+import dbConnect from '@/lib/dbConnect'
+import Notification from '@/models/notification.model'
+import { type NotificationResponse } from '@/types/notifications.types'
+import mongoose from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
 
-/**
- * Mock database for notifications
- * In a real application, this would be replaced with a proper database
- * @type {Notification[]}
- */
-const notifications: Notification[] = [
-  {
-    id: '1',
-    type: 'Photo',
-    space: '230 X 500 PX',
-    country: 'Saudi Arabia',
-    city: 'Riyadh',
-    dateTime: '14, Jan, 2025 - 11:08 PM',
-    status: 'Delivered',
-  },
-  {
-    id: '2',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'United Arab Emirates',
-    city: 'Dubai',
-    dateTime: '14, Jan, 2025 - 10:30 PM',
-    status: 'In Progress',
-  },
-  {
-    id: '3',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'Kuwait',
-    city: 'Kuwait City',
-    dateTime: '14, Jan, 2025 - 09:45 PM',
-    status: 'Cancelled',
-  },
-  {
-    id: '4',
-    type: 'Photo',
-    space: 'PX 230 X 500',
-    country: 'Qatar',
-    city: 'Doha',
-    dateTime: '14, Jan, 2025 - 09:15 PM',
-    status: 'Delivered',
-  },
-  {
-    id: '5',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'Bahrain',
-    city: 'Manama',
-    dateTime: '14, Jan, 2025 - 08:50 PM',
-    status: 'In Progress',
-  },
-  {
-    id: '6',
-    type: 'Photo',
-    space: '230 X 500 PX',
-    country: 'Oman',
-    city: 'Muscat',
-    dateTime: '14, Jan, 2025 - 08:20 PM',
-    status: 'Delivered',
-  },
-  {
-    id: '7',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'Egypt',
-    city: 'Cairo',
-    dateTime: '14, Jan, 2025 - 07:45 PM',
-    status: 'In Progress',
-  },
-  {
-    id: '8',
-    type: 'Photo',
-    space: '230 X 500 PX',
-    country: 'Jordan',
-    city: 'Amman',
-    dateTime: '14, Jan, 2025 - 07:15 PM',
-    status: 'Cancelled',
-  },
-  {
-    id: '9',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'Lebanon',
-    city: 'Beirut',
-    dateTime: '14, Jan, 2025 - 06:40 PM',
-    status: 'Delivered',
-  },
-  {
-    id: '10',
-    type: 'Photo',
-    space: '230 X 500 PX',
-    country: 'Iraq',
-    city: 'Baghdad',
-    dateTime: '14, Jan, 2025 - 06:10 PM',
-    status: 'In Progress',
-  },
-  {
-    id: '11',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'Yemen',
-    city: 'Sanaa',
-    dateTime: '14, Jan, 2025 - 05:35 PM',
-    status: 'Cancelled',
-  },
-  {
-    id: '12',
-    type: 'Photo',
-    space: '230 X 500 PX',
-    country: 'Syria',
-    city: 'Damascus',
-    dateTime: '14, Jan, 2025 - 05:00 PM',
-    status: 'Delivered',
-  },
-  {
-    id: '13',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'Palestine',
-    city: 'Gaza',
-    dateTime: '14, Jan, 2025 - 04:25 PM',
-    status: 'In Progress',
-  },
-  {
-    id: '14',
-    type: 'Photo',
-    space: '230 X 500 PX',
-    country: 'Libya',
-    city: 'Tripoli',
-    dateTime: '14, Jan, 2025 - 03:50 PM',
-    status: 'Cancelled',
-  },
-  {
-    id: '15',
-    type: 'Text',
-    space: 'PX 230 X 500',
-    country: 'Tunisia',
-    city: 'Tunis',
-    dateTime: '14, Jan, 2025 - 03:15 PM',
-    status: 'Delivered',
-  },
-]
+// Cache connection promise
+let connectionPromise: Promise<typeof mongoose> | null = null
 
 /**
- * GET handler for notifications with server-side pagination
+ * GET handler for notifications with optimized pagination
  *
  * @param {NextRequest} req - The incoming request object
  *
@@ -157,36 +19,55 @@ const notifications: Notification[] = [
  */
 export async function GET(req: NextRequest) {
   try {
+    // Reuse connection promise
+    if (!connectionPromise) {
+      connectionPromise = dbConnect()
+    }
+    await connectionPromise
+
     const searchParams = req.nextUrl.searchParams
+    const page = Number(searchParams.get('page') ?? '1')
+    const limit = Number(searchParams.get('limit') ?? '10')
+    const skip = (page - 1) * limit
 
-    // Change pageSize to limit to match client-side parameter name
-    const pageParam = searchParams.get('page')
-    const limitParam = searchParams.get('limit') // Changed from pageSize to limit
+    // Execute queries in parallel
+    const [notifications, totalCount] = await Promise.all([
+      Notification.find()
+        .select('type space country city dateTime status') // Select only needed fields
+        .sort({ dateTime: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(), // Add exec() for better performance
+      Notification.countDocuments().exec(),
+    ])
 
-    // Use nullish coalescing for defaults
-    const page = Number(pageParam ?? '1')
-    const limit = Number(limitParam ?? '10') // Changed variable name to match
-
-    // Calculate pagination using limit
-    const startIndex = (page - 1) * limit
-    const endIndex = startIndex + limit
-    const paginatedData = notifications.slice(startIndex, endIndex)
-
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const totalCount = notifications.length
+    // Optimize the mapping operation
     const response: NotificationResponse = {
-      data: paginatedData,
+      data: notifications.map((doc) => ({
+        id: (doc._id as mongoose.Types.ObjectId).toString(),
+        type: doc.type,
+        space: doc.space,
+        country: doc.country,
+        city: doc.city,
+        dateTime: new Date(doc.dateTime).toLocaleString(),
+        status: doc.status,
+      })),
       metadata: {
         currentPage: page,
         totalPages: Math.ceil(totalCount / limit),
-        pageSize: limit, // This is fine as the response type expects pageSize
+        pageSize: limit,
         totalCount,
       },
     }
 
-    return NextResponse.json(response)
+    // Cache headers for better client-side caching
+    return new NextResponse(JSON.stringify(response), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=59',
+      },
+    })
   } catch (error) {
     console.error('Error in notifications API:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
@@ -194,7 +75,7 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * POST handler for creating new notifications
+ * POST handler for creating notifications
  *
  * Validates required fields and generates:
  * - Unique ID
@@ -221,28 +102,30 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const newNotification = await req.json()
-
-    // Validate required fields
-    if (!newNotification.type || !newNotification.country || !newNotification.city) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    if (!connectionPromise) {
+      connectionPromise = dbConnect()
     }
+    await connectionPromise
 
-    // Create complete notification object
-    const notification: Notification = {
-      ...newNotification,
-      id: crypto.randomUUID(),
-      dateTime: newNotification.dateTime || new Date().toLocaleString(),
-      status: newNotification.status || 'In Progress',
-    }
+    const data = await req.json()
+    const notification = await Notification.create(data)
 
-    // Add to notifications array
-    notifications.unshift(notification)
-    revalidateTag('notifications')
+    // Convert to plain object once
+    const notificationObj = notification.toObject()
 
-    return NextResponse.json(notification, { status: 201 })
+    return NextResponse.json(
+      {
+        ...notificationObj,
+        id: notificationObj._id.toString(),
+        dateTime: new Date(notificationObj.dateTime).toLocaleString(),
+      },
+      { status: 201 }
+    )
   } catch (error) {
     console.error('Error adding notification:', error)
+    if (error instanceof mongoose.Error.ValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Failed to add notification' }, { status: 500 })
   }
 }
@@ -267,20 +150,20 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const { searchParams } = req.nextUrl
-    const id = searchParams.get('id')
+    if (!connectionPromise) {
+      connectionPromise = dbConnect()
+    }
+    await connectionPromise
 
+    const id = req.nextUrl.searchParams.get('id')
     if (!id) {
       return NextResponse.json({ error: 'Missing notification ID' }, { status: 400 })
     }
 
-    const index = notifications.findIndex((n) => n.id === id)
-    if (index === -1) {
+    const result = await Notification.findByIdAndDelete(id).exec()
+    if (!result) {
       return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
     }
-
-    notifications.splice(index, 1)
-    revalidateTag('notifications')
 
     return NextResponse.json({ success: true })
   } catch (error) {
@@ -314,31 +197,38 @@ export async function DELETE(req: NextRequest) {
  */
 export async function PUT(req: NextRequest) {
   try {
-    const { searchParams } = req.nextUrl
-    const id = searchParams.get('id')
-    const updates = await req.json()
+    if (!connectionPromise) {
+      connectionPromise = dbConnect()
+    }
+    await connectionPromise
 
+    const id = req.nextUrl.searchParams.get('id')
     if (!id) {
       return NextResponse.json({ error: 'Missing notification ID' }, { status: 400 })
     }
 
-    const index = notifications.findIndex((n) => n.id === id)
-    if (index === -1) {
+    const updates = await req.json()
+    const notification = await Notification.findByIdAndUpdate(
+      id,
+      { ...updates, dateTime: new Date() },
+      { new: true, runValidators: true }
+    ).exec()
+
+    if (!notification) {
       return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
     }
 
-    // Update notification with new timestamp
-    notifications[index] = {
-      ...notifications[index],
-      ...updates,
-      dateTime: new Date().toLocaleString(),
-    }
-
-    revalidateTag('notifications')
-
-    return NextResponse.json(notifications[index])
+    const notificationObj = notification.toObject()
+    return NextResponse.json({
+      ...notificationObj,
+      id: notificationObj._id.toString(),
+      dateTime: new Date(notificationObj.dateTime).toLocaleString(),
+    })
   } catch (error) {
     console.error('Error updating notification:', error)
+    if (error instanceof mongoose.Error.ValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Failed to update notification' }, { status: 500 })
   }
 }

@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table/data-table'
 import { useNotifications } from '@/hooks/use-notifications'
+import { cn } from '@/lib/utils'
 import { Plus, RefreshCcw } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
@@ -56,19 +57,31 @@ export function NotificationTable({ initialPage = 1, initialLimit = 10 }: { init
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">
-            Total Notifications: {data?.metadata?.totalCount}
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            Total Notifications: <span className="flex items-center gap-2">
+              {data?.metadata?.totalCount ?? <RefreshCcw
+                className={cn(
+                  'h-4 w-4',
+                  isFetching ? 'animate-spin' : ''
+                )}
+              />}
+            </span>
           </h1>
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="gap-2"
+            className="gap-2 min-w-[130px]"
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCcw
+              className={cn(
+                'h-4 w-4',
+                isFetching ? 'animate-spin' : ''
+              )}
+            />
             {isFetching ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button size="sm" onClick={() => setAddModalOpen(true)} className="gap-2">

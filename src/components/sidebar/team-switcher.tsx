@@ -16,6 +16,7 @@ export function TeamSwitcher() {
               width={150}
               height={0}
               className="h-[30px] w-auto group-data-[collapsible=icon]:hidden"
+              priority
             />
             <p className="font-bold text-3xl text-primary-green uppercase group-data-[collapsible=icon]:block hidden">
               D
