@@ -92,7 +92,6 @@ const containsFilter = (value: string, filterValue: string): boolean => {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  searchableColumns,
   filterableColumns,
   loading = false,
   totalCount,
@@ -199,7 +198,6 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <DataTableToolbar
         table={table}
-        searchableColumns={searchableColumns}
         filterableColumns={filterableColumns}
         totalCount={totalCount}
         onRefresh={onRefresh}

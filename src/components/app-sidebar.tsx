@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, ChartSpline, Home } from 'lucide-react'
+import { Bell, Home } from 'lucide-react'
 import * as React from 'react'
 
 import { Nav, NavItem } from '@/components/nav'
@@ -20,27 +20,7 @@ const navigationItems: NavItem[] = [
     title: 'Home',
     url: '/',
     icon: Home,
-    // isActive: true,
-  },
-  {
-    title: 'Analytics',
-    url: '/analytics',
-    icon: ChartSpline,
-    isActive: false,
-    items: [
-      {
-        title: 'Overview',
-        url: '/analytics',
-      },
-      {
-        title: 'Starred',
-        url: '/analytics/starred',
-      },
-      {
-        title: 'Settings',
-        url: '/analytics/settings',
-      },
-    ],
+    isActive: true,
   },
   {
     title: 'Notifications',

@@ -2,31 +2,19 @@
 
 import {
   ChevronRight,
-  Folder,
-  Forward,
-  MoreHorizontal,
-  Trash2,
-  type LucideIcon,
+  type LucideIcon
 } from 'lucide-react'
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
   SidebarGroup,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
+  useSidebar
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
 
@@ -105,7 +93,7 @@ export function Nav({ items, hideProjectsOnCollapse = false }: NavProps) {
                   <span>{displayName}</span>
                 </Link>
               </SidebarMenuButton>
-              {isProject && (
+              {/* {isProject && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuAction showOnHover>
@@ -133,7 +121,7 @@ export function Nav({ items, hideProjectsOnCollapse = false }: NavProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )}
+              )} */}
             </SidebarMenuItem>
           )
         })}

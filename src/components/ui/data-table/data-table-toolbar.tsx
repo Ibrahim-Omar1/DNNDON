@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table } from '@tanstack/react-table'
-import { RefreshCcw, Search, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
 import { DataTableViewOptions } from './data-table-view-options'
 
@@ -22,7 +22,6 @@ interface FilterableColumn extends ColumnConfig {
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
-  searchableColumns?: ColumnConfig[]
   filterableColumns?: FilterableColumn[]
   totalCount: number
   onRefresh?: () => void
@@ -33,11 +32,7 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({
   table,
-  searchableColumns = [],
   filterableColumns = [],
-  totalCount,
-  onRefresh,
-  isRefetching,
   globalFilter = '',
   onGlobalFilterChange,
 }: DataTableToolbarProps<TData>) {
@@ -45,23 +40,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Total: {totalCount}</h2>
-        {onRefresh && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefresh}
-            disabled={isRefetching}
-            className="gap-2"
-          >
-            <RefreshCcw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
-            {isRefetching ? 'Refreshing...' : 'Refresh'}
-          </Button>
-        )}
-      </div>
-
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center space-x-2">
           {/* Global Search */}
           <div className="relative">
