@@ -79,6 +79,26 @@ const useNotifications = (
 }
 
 /**
+ * Custom hook to get cached notifications data.
+ *
+ * This hook attempts to retrieve notification data from the TanStack Query cache.
+ * If the data is not available in the cache, it fetches the data using the `useNotifications` hook.
+ *
+ * @returns {NotificationsResponse | undefined} The cached notification data, or undefined if not available.
+ */
+const useGetCachedNotifications = () => {
+  const queryClient = useQueryClient()
+  const data = queryClient.getQueryData<NotificationsResponse>(['notifications'])
+
+  if (!data) {
+    const { data: newData } = useNotifications()
+    return newData
+  }
+
+  return data
+}
+
+/**
  * Custom hook for adding new notifications
  *
  * Uses TanStack Query mutations for state updates and cache invalidation.
@@ -190,4 +210,10 @@ const useUpdateNotification = () => {
   })
 }
 
-export { useAddNotification, useDeleteNotification, useNotifications, useUpdateNotification }
+export {
+  useAddNotification,
+  useDeleteNotification,
+  useGetCachedNotifications,
+  useNotifications,
+  useUpdateNotification,
+}
