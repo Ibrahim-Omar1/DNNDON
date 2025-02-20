@@ -1,9 +1,5 @@
 'use client'
 
-import * as React from 'react'
-import { Column } from '@tanstack/react-table'
-import { Check, PlusCircle } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,6 +13,10 @@ import {
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
+import { Column } from '@tanstack/react-table'
+import { Check, PlusCircle } from 'lucide-react'
+import * as React from 'react'
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
@@ -45,12 +45,18 @@ export function DataTableFacetedFilter<TData, TValue>({
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
-              <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
+              <Badge
+                variant="secondary"
+                className="rounded-sm px-1 font-normal lg:hidden"
+              >
                 {selectedValues.size}
               </Badge>
               <div className="hidden space-x-1 lg:flex">
                 {selectedValues.size > 2 ? (
-                  <Badge variant="secondary" className="rounded-sm px-1 font-normal">
+                  <Badge
+                    variant="secondary"
+                    className="rounded-sm px-1 font-normal"
+                  >
                     {selectedValues.size} selected
                   </Badge>
                 ) : (
@@ -89,7 +95,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                         selectedValues.add(option.value)
                       }
                       const filterValues = Array.from(selectedValues)
-                      column?.setFilterValue(filterValues.length ? filterValues : undefined)
+                      column?.setFilterValue(
+                        filterValues.length ? filterValues : undefined
+                      )
                     }}
                   >
                     <div
@@ -102,7 +110,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                     >
                       <Check className={cn('h-4 w-4')} />
                     </div>
-                    {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
+                    {option.icon && (
+                      <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                    )}
                     <span>{option.label}</span>
                     {facets?.get(option.value) && (
                       <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">

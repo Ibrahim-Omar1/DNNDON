@@ -74,7 +74,7 @@ const useNotifications = (
     queryFn: () => getNotifications(params),
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     refetchOnWindowFocus: false,
-    // keepPreviousData: true, // Keep previous data while loading new data
+    keepPreviousData: true, // Add this to keep previous data while loading new data
   })
 }
 

@@ -13,6 +13,7 @@ import {
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -95,6 +96,7 @@ export function DataTable<TData, TValue>({
   pagination,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [rowSelection, setRowSelection] = useState({})
 
   const table = useReactTable({
     data,
@@ -102,6 +104,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     pageCount: pagination ? Math.ceil(pagination.total / pagination.pageSize) : undefined,
     onPaginationChange: (updater) => {
@@ -110,31 +113,37 @@ export function DataTable<TData, TValue>({
       if (pagination?.onPageChange) {
         pagination.onPageChange(state.pageIndex + 1)
       }
-      if (pagination?.onPageSizeChange && state.pageSize !== table.getState().pagination.pageSize) {
+      if (pagination?.onPageSizeChange) {
         pagination.onPageSizeChange(state.pageSize)
       }
     },
     state: {
       pagination: {
         pageSize: pagination?.pageSize || 10,
-        pageIndex: (pagination?.page || 1) - 1,
+        pageIndex: (pagination?.page ? pagination.page - 1 : 0),
       },
       columnFilters,
+      rowSelection,
     },
     onColumnFiltersChange: setColumnFilters,
+    onRowSelectionChange: setRowSelection,
     filterFns: {
       contains: (row, columnId, filterValue) => {
-        const value = row.getValue(columnId) as string
-        return containsFilter(value, filterValue)
+        const value = row.getValue(columnId)
+        return value != null
+          ? String(value).toLowerCase().includes(String(filterValue).toLowerCase())
+          : false
       },
     },
   })
 
-  // Force update table state when URL params change
+  // Force update table state when pagination props change
   useEffect(() => {
-    table.setPageIndex(pagination?.page ? pagination.page - 1 : 0)
-    table.setPageSize(pagination?.pageSize || 10)
-  }, [table, pagination?.page, pagination?.pageSize])
+    if (pagination) {
+      table.setPageSize(pagination.pageSize)
+      table.setPageIndex(pagination.page - 1)
+    }
+  }, [pagination?.page, pagination?.pageSize, table])
 
   return (
     <div className="space-y-4">

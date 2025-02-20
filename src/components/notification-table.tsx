@@ -66,7 +66,7 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
     (newPage: number) => {
       router.push(
         `${pathname}?${createQueryString({ page: newPage, limit })}`,
-        { scroll: false } // Prevent scrolling to top on page change
+        { scroll: false }
       )
     },
     [router, pathname, limit, createQueryString]
@@ -74,9 +74,11 @@ export function NotificationTable({ initialPage, initialLimit }: NotificationTab
 
   const handleLimitChange = useCallback(
     (newLimit: number) => {
-      router.push(`${pathname}?${createQueryString({ page: 1, limit: newLimit })}`, {
-        scroll: false,
-      })
+      // Reset to page 1 when changing limit
+      router.push(
+        `${pathname}?${createQueryString({ page: 1, limit: newLimit })}`,
+        { scroll: false }
+      )
     },
     [router, pathname, createQueryString]
   )

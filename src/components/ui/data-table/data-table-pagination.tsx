@@ -27,27 +27,28 @@ export function DataTablePagination<TData>({ table, totalRows }: DataTablePagina
       <div className="flex-1 text-sm text-muted-foreground">
         {total > 0
           ? `Showing ${pageIndex * pageSize + 1} to ${Math.min(
-              (pageIndex + 1) * pageSize,
-              total
-            )} of ${total} results`
+            (pageIndex + 1) * pageSize,
+            total
+          )} of ${total} results`
           : 'No results.'}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
-            value={`${table.getState().pagination.pageSize}`}
+            value={`${pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value))
+              const newSize = Number(value)
+              table.setPageSize(newSize)
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {pageSizeOptions.map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
+              {pageSizeOptions.map((size) => (
+                <SelectItem key={size} value={`${size}`}>
+                  {size}
                 </SelectItem>
               ))}
             </SelectContent>
