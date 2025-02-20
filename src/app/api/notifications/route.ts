@@ -159,17 +159,17 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams
 
-    // Await searchParams values
-    const pageParam = await searchParams.get('page')
-    const pageSizeParam = await searchParams.get('pageSize')
+    // Change pageSize to limit to match client-side parameter name
+    const pageParam = searchParams.get('page')
+    const limitParam = searchParams.get('limit') // Changed from pageSize to limit
 
     // Use nullish coalescing for defaults
     const page = Number(pageParam ?? '1')
-    const pageSize = Number(pageSizeParam ?? '10')
+    const limit = Number(limitParam ?? '10') // Changed variable name to match
 
-    // Calculate pagination
-    const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
+    // Calculate pagination using limit
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
     const paginatedData = notifications.slice(startIndex, endIndex)
 
     // Simulate network delay
@@ -180,8 +180,8 @@ export async function GET(req: NextRequest) {
       data: paginatedData,
       metadata: {
         currentPage: page,
-        totalPages: Math.ceil(totalCount / pageSize),
-        pageSize,
+        totalPages: Math.ceil(totalCount / limit),
+        pageSize: limit, // This is fine as the response type expects pageSize
         totalCount,
       },
     }

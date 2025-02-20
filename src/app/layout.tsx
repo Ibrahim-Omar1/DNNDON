@@ -1,5 +1,5 @@
-import { AppSidebar } from '@/components/app-sidebar'
 import MainNavbar from '@/components/navbar/MainNavbar'
+import { AppSidebar } from '@/components/sidebar/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import type { Metadata } from 'next'

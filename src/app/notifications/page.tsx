@@ -1,4 +1,4 @@
-import { NotificationTable } from '@/components/notification-table'
+import { NotificationTable } from '@/components/notifications/notification-table'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -19,7 +19,10 @@ const Page = async ({ searchParams }: PageProps) => {
 
   return (
     <>
-      <NotificationTable initialPage={Number(page ?? 1)} initialLimit={Number(limit ?? 10)} />
+      <NotificationTable
+        initialPage={Number(page ?? 1)}
+        initialLimit={Number(limit ?? 10)}
+      />
     </>
   )
 }
