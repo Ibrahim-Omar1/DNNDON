@@ -11,7 +11,7 @@ import { type Notification } from '@/types/notifications.types'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react'
 import { useState } from 'react'
-import ColumnHeaderOptions from './ColumnHeaderOptions'
+import ColumnHeaderOptions from '../ui/data-table/ColumnHeaderOptions'
 import { DeleteNotificationDialog } from './delete-notification-dialog'
 import { EditNotificationModal } from './edit-notification-modal'
 
