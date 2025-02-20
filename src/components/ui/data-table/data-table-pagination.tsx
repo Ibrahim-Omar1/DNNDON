@@ -48,9 +48,7 @@ export function DataTablePagination<TData>({ table, totalRows }: DataTablePagina
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        {total > 0
-          ? `Showing ${startRow} to ${endRow} of ${total} results`
-          : 'No results.'}
+        {total > 0 ? `Showing ${startRow} to ${endRow} of ${total} results` : 'No results.'}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
@@ -127,7 +125,8 @@ export function DataTablePagination<TData>({ table, totalRows }: DataTablePagina
             }}
             className={buttonVariants({
               variant: 'outline',
-              className: 'hidden h-8 w-8 p-0 lg:flex aria-disabled:opacity-50 aria-disabled:cursor-not-allowed',
+              className:
+                'hidden h-8 w-8 p-0 lg:flex aria-disabled:opacity-50 aria-disabled:cursor-not-allowed',
             })}
             aria-disabled={!canNextPage}
           >

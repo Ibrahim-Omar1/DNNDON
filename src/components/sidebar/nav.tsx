@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  ChevronRight,
-  type LucideIcon
-} from 'lucide-react'
+import { ChevronRight, type LucideIcon } from 'lucide-react'
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
@@ -13,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
 

@@ -34,7 +34,6 @@ interface FilterableColumn extends ColumnConfig {
   }[]
 }
 
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -52,7 +51,6 @@ const HEADER_HEIGHT = 45 // Height of the header row
 const MIN_ROWS_SHOWN = 5 // Minimum number of rows to show
 
 function getColumnWidth(column: ColumnDef<any, any>) {
-  // @ts-ignore - accessing internal meta property
   if (column.size) return column.size
   if (column.id === 'number') return 50 // Fixed width for number column
   if (column.id === 'actions') return 70 // Fixed width for actions column
@@ -67,7 +65,7 @@ function SkeletonCell({ column }: { column: ColumnDef<any, any> }) {
         className="h-4 animate-pulse rounded bg-muted"
         style={{
           width: column.id === 'actions' ? '24px' : '80%',
-          minWidth: '24px'
+          minWidth: '24px',
         }}
       />
     </TableCell>
@@ -143,20 +141,18 @@ export function DataTable<TData, TValue>({
   // Update URL when pagination changes
   const handlePageChange = useCallback(
     (newPage: number) => {
-      router.push(
-        `${pathname}?${createQueryString({ page: newPage, limit: pageSize })}`,
-        { scroll: false }
-      )
+      router.push(`${pathname}?${createQueryString({ page: newPage, limit: pageSize })}`, {
+        scroll: false,
+      })
     },
     [router, pathname, pageSize, createQueryString]
   )
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
-      router.push(
-        `${pathname}?${createQueryString({ page: 1, limit: newPageSize })}`,
-        { scroll: false }
-      )
+      router.push(`${pathname}?${createQueryString({ page: 1, limit: newPageSize })}`, {
+        scroll: false,
+      })
     },
     [router, pathname, createQueryString]
   )
@@ -207,7 +203,7 @@ export function DataTable<TData, TValue>({
   }, [page, pageSize, table])
 
   // Calculate minimum table height
-  const minTableHeight = HEADER_HEIGHT + (DEFAULT_ROW_HEIGHT * MIN_ROWS_SHOWN)
+  const minTableHeight = HEADER_HEIGHT + DEFAULT_ROW_HEIGHT * MIN_ROWS_SHOWN
 
   return (
     <div className="space-y-4">
@@ -264,10 +260,7 @@ export function DataTable<TData, TValue>({
               ) : (
                 // Empty state
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-[212px] text-center"
-                  >
+                  <TableCell colSpan={columns.length} className="h-[212px] text-center">
                     <div className="flex flex-col items-center justify-center h-full space-y-1">
                       <div className="text-muted-foreground">No results.</div>
                     </div>
