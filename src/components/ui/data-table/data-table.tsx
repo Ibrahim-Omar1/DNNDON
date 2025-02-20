@@ -17,7 +17,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Loader2 } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { DataTablePagination } from './data-table-pagination'
@@ -45,6 +44,34 @@ interface DataTableProps<TData, TValue> {
   totalCount: number
   onRefresh?: () => void
   isRefetching?: boolean
+}
+
+// Add this constant at the top of the file
+const DEFAULT_ROW_HEIGHT = 53 // Height of a single row in pixels
+const HEADER_HEIGHT = 45 // Height of the header row
+const MIN_ROWS_SHOWN = 5 // Minimum number of rows to show
+
+function getColumnWidth(column: ColumnDef<any, any>) {
+  // @ts-ignore - accessing internal meta property
+  if (column.size) return column.size
+  if (column.id === 'number') return 50 // Fixed width for number column
+  if (column.id === 'actions') return 70 // Fixed width for actions column
+  return 'auto' // Default to auto width
+}
+
+function SkeletonCell({ column }: { column: ColumnDef<any, any> }) {
+  const width = getColumnWidth(column)
+  return (
+    <TableCell style={{ width }}>
+      <div
+        className="h-4 animate-pulse rounded bg-muted"
+        style={{
+          width: column.id === 'actions' ? '24px' : '80%',
+          minWidth: '24px'
+        }}
+      />
+    </TableCell>
+  )
 }
 
 /**
@@ -179,6 +206,9 @@ export function DataTable<TData, TValue>({
     }
   }, [page, pageSize, table])
 
+  // Calculate minimum table height
+  const minTableHeight = HEADER_HEIGHT + (DEFAULT_ROW_HEIGHT * MIN_ROWS_SHOWN)
+
   return (
     <div className="space-y-4">
       <DataTableToolbar
@@ -191,51 +221,62 @@ export function DataTable<TData, TValue>({
         onGlobalFilterChange={setGlobalFilter}
       />
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-[400px] text-center">
-                  <div className="flex items-center justify-center h-full">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+        <div style={{ minHeight: `${minTableHeight}px` }}>
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      style={{ width: getColumnWidth(header.column.columnDef) }}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              // Empty state
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-[400px] text-center">
-                  <div className="flex flex-col items-center justify-center h-full space-y-1">
-                    <div className="text-muted-foreground">No results.</div>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                Array.from({ length: MIN_ROWS_SHOWN }).map((_, index) => (
+                  <TableRow key={index}>
+                    {columns.map((column, cellIndex) => (
+                      <SkeletonCell key={cellIndex} column={column} />
+                    ))}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        style={{ width: getColumnWidth(cell.column.columnDef) }}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                // Empty state
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-[212px] text-center"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full space-y-1">
+                      <div className="text-muted-foreground">No results.</div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
       <DataTablePagination table={table} totalRows={totalCount} />
     </div>

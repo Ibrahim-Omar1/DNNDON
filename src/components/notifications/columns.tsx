@@ -19,39 +19,46 @@ export const columns: ColumnDef<Notification>[] = [
   {
     id: 'number',
     header: '#',
+    size: 50,
     cell: ({ row }) => {
-      return <div className="text-sm text-muted-foreground w-10">{row.index + 1}</div>
+      return <div className="text-sm text-muted-foreground">{row.index + 1}</div>
     },
-    enableSorting: false,
   },
   {
     accessorKey: 'type',
+    size: 120,
     header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'space',
+    size: 150,
     header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'country',
+    size: 120,
     header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'city',
+    size: 150,
     header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'dateTime',
+    size: 180,
     header: ({ column }) => <ColumnHeaderOptions column={column} />,
   },
   {
     accessorKey: 'status',
+    size: 120,
     header: ({ column }) => <ColumnHeaderOptions column={column} />,
     cell: StatusCell,
   },
   {
     id: 'actions',
     header: 'Actions',
+    size: 70,
     cell: ActionsCell,
   },
 ]
@@ -62,12 +69,11 @@ function StatusCell({ row }: { row: Row<Notification> }) {
     <span
       className={`
         inline-flex rounded-full px-3 py-1 text-xs font-medium
-        ${
-          status === 'Delivered'
-            ? 'bg-green-50 text-green-600'
-            : status === 'In Progress'
-              ? 'bg-yellow-50 text-yellow-600'
-              : 'bg-red-50 text-red-500'
+        ${status === 'Delivered'
+          ? 'bg-green-50 text-green-600'
+          : status === 'In Progress'
+            ? 'bg-yellow-50 text-yellow-600'
+            : 'bg-red-50 text-red-500'
         }
       `}
     >
