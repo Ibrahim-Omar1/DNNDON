@@ -140,8 +140,13 @@ export function DataTable<TData, TValue>({
   // Force update table state when pagination props change
   useEffect(() => {
     if (pagination) {
-      table.setPageSize(pagination.pageSize)
-      table.setPageIndex(pagination.page - 1)
+      // Don't update the table state if it matches the pagination props
+      if (table.getState().pagination.pageIndex !== pagination.page - 1) {
+        table.setPageIndex(pagination.page - 1)
+      }
+      if (table.getState().pagination.pageSize !== pagination.pageSize) {
+        table.setPageSize(pagination.pageSize)
+      }
     }
   }, [pagination?.page, pagination?.pageSize, table])
 
