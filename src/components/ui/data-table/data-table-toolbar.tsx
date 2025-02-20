@@ -27,6 +27,8 @@ interface DataTableToolbarProps<TData> {
   totalCount: number
   onRefresh?: () => void
   isRefetching?: boolean
+  globalFilter?: string
+  onGlobalFilterChange?: (value: string) => void
 }
 
 export function DataTableToolbar<TData>({
@@ -36,6 +38,8 @@ export function DataTableToolbar<TData>({
   totalCount,
   onRefresh,
   isRefetching,
+  globalFilter = '',
+  onGlobalFilterChange,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
@@ -59,20 +63,18 @@ export function DataTableToolbar<TData>({
 
       <div className="flex items-center justify-between p-4">
         <div className="flex flex-1 items-center space-x-2">
-          {searchableColumns.length > 0 &&
-            searchableColumns.map((column) => (
-              <div key={column.id} className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder={`Search ${column.title}...`}
-                  value={(table.getColumn(column.id)?.getFilterValue() as string) ?? ''}
-                  onChange={(event) =>
-                    table.getColumn(column.id)?.setFilterValue(event.target.value)
-                  }
-                  className="pl-9 h-9 w-[150px] lg:w-[250px] bg-gray-50/50 border-gray-200 focus-visible:ring-gray-200"
-                />
-              </div>
-            ))}
+          {/* Global Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search all..."
+              value={globalFilter}
+              onChange={(event) => onGlobalFilterChange?.(event.target.value)}
+              className="pl-9 h-9 w-[150px] lg:w-[250px] bg-gray-50/50 border-gray-200 focus-visible:ring-gray-200"
+            />
+          </div>
+
+          {/* Column Filters */}
           {filterableColumns.length > 0 &&
             filterableColumns.map((column) => {
               const columnFilter = table.getColumn(column.id)
@@ -87,10 +89,13 @@ export function DataTableToolbar<TData>({
                 />
               )
             })}
-          {isFiltered && (
+          {(isFiltered || globalFilter) && (
             <Button
               variant="ghost"
-              onClick={() => table.resetColumnFilters()}
+              onClick={() => {
+                table.resetColumnFilters()
+                onGlobalFilterChange?.('')
+              }}
               className="h-8 px-2 lg:px-3"
             >
               Reset

@@ -100,6 +100,7 @@ export function DataTable<TData, TValue>({
   isRefetching,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
   const [rowSelection, setRowSelection] = useState({})
 
   const router = useRouter()
@@ -163,10 +164,18 @@ export function DataTable<TData, TValue>({
         pageIndex: page - 1,
       },
       columnFilters,
+      globalFilter,
       rowSelection,
     },
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     onRowSelectionChange: setRowSelection,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const value = row.getValue(columnId)
+      return value != null
+        ? String(value).toLowerCase().includes(String(filterValue).toLowerCase())
+        : false
+    },
     onPaginationChange: (updater) => {
       const state = typeof updater === 'function' ? updater(table.getState().pagination) : updater
       handlePageChange(state.pageIndex + 1)
@@ -195,6 +204,8 @@ export function DataTable<TData, TValue>({
         totalCount={totalCount}
         onRefresh={onRefresh}
         isRefetching={isRefetching}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
       />
       <div className="rounded-md border">
         <Table>

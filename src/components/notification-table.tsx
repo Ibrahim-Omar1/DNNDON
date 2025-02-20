@@ -68,13 +68,6 @@ export function NotificationTable({ initialPage = 1, initialLimit = 10 }: { init
         totalCount={data?.metadata?.totalCount || 0}
         onRefresh={refetch}
         isRefetching={isFetching}
-        searchableColumns={[
-          {
-            id: 'country',
-            title: 'Country',
-          },
-          
-        ]}
         filterableColumns={[
           {
             id: 'status',
