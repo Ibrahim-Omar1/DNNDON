@@ -215,6 +215,7 @@ const useUpdateNotification = () => {
         queryKey: ['notifications'],
         refetchType: 'all',
       })
+
       toast.success('Notification updated successfully')
     },
     onError: (error: Error) => {
