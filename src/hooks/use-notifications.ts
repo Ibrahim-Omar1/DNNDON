@@ -1,4 +1,3 @@
-import { revalidateNotifications } from '@/app/actions'
 import {
   addNotification,
   deleteNotification,
@@ -55,7 +54,9 @@ const useNotifications = (params: {
     queryFn: () => getNotifications(params),
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     refetchOnWindowFocus: false,
-    // placeholderData: (prev) => prev, // Add this to keep previous data while loading new data
+    refetchOnMount: false,
+    _optimisticResults: 'optimistic',
+    placeholderData: (prev) => prev, // Add this to keep previous data while loading new data
   })
 }
 
@@ -116,10 +117,8 @@ const useAddNotification = () => {
       // Invalidate and refetch all notification queries
       await queryClient.invalidateQueries({
         queryKey: ['notifications'],
-        refetchType: 'all'
+        refetchType: 'all',
       })
-      // Revalidate server cache
-      await revalidateNotifications()
       toast.success('Notification added successfully')
     },
     onError: () => {
@@ -163,10 +162,8 @@ const useDeleteNotification = () => {
       // Invalidate and refetch all notification queries
       await queryClient.invalidateQueries({
         queryKey: ['notifications'],
-        refetchType: 'all'
+        refetchType: 'all',
       })
-      // Revalidate server cache
-      await revalidateNotifications()
       toast.success('Notification deleted successfully')
     },
     onError: (error: Error) => {
@@ -216,10 +213,8 @@ const useUpdateNotification = () => {
       // Invalidate and refetch all notification queries
       await queryClient.invalidateQueries({
         queryKey: ['notifications'],
-        refetchType: 'all'
+        refetchType: 'all',
       })
-      // Revalidate server cache
-      await revalidateNotifications()
       toast.success('Notification updated successfully')
     },
     onError: (error: Error) => {

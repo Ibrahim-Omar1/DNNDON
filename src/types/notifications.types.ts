@@ -1,6 +1,6 @@
 export interface Notification {
   id: string
-  type: 'Photo' | 'Text'
+  type: string
   space: string
   country: string
   city: string

@@ -11,15 +11,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     () =>
       new QueryClient({
         defaultOptions: {
-          queries: {
-            staleTime: 0,
-            refetchOnWindowFocus: true,
-            refetchOnMount: true,
-            retry: 1,
-          },
-          mutations: {
-            retry: 1,
-          },
+          // queries: {
+          //   refetchOnWindowFocus: true,
+          //   refetchOnMount: true,
+          //   retry: 1,
+          // },
+          // mutations: {
+          //   retry: 1,
+          // },
         },
       })
   )
