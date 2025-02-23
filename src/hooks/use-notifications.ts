@@ -1,3 +1,4 @@
+import { revalidateNotifications } from '@/app/actions'
 import {
   addNotification,
   deleteNotification,
@@ -145,13 +146,22 @@ const useDeleteNotification = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: deleteNotification,
-    onSuccess: () => {
+    mutationFn: async (id: string) => {
+      const response = await deleteNotification(id)
+      if (!response) {
+        throw new Error('Failed to delete notification')
+      }
+      return response
+    },
+    onSuccess: async () => {
+      // Revalidate server-side cache
+      await revalidateNotifications()
+      // Invalidate client-side cache
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success('Notification deleted successfully')
     },
-    onError: () => {
-      toast.error('Failed to delete notification')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to delete notification')
     },
   })
 }
@@ -186,13 +196,22 @@ const useUpdateNotification = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => updateNotification(id, data),
-    onSuccess: () => {
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const response = await updateNotification(id, data)
+      if (!response) {
+        throw new Error('Failed to update notification')
+      }
+      return response
+    },
+    onSuccess: async (data) => {
+      // Revalidate server-side cache
+      await revalidateNotifications()
+      // Invalidate client-side cache
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success('Notification updated successfully')
     },
-    onError: () => {
-      toast.error('Failed to update notification')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to update notification')
     },
   })
 }

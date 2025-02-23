@@ -124,18 +124,23 @@ const addNotification = async (data: Partial<Notification>): Promise<Notificatio
  * @returns Promise that resolves when the notification is deleted.
  * @throws Error if the API request fails.
  */
-const deleteNotification = async (id: string): Promise<void> => {
-  const baseUrl = getBaseUrl()
-  const response = await fetch(`${baseUrl}/api/notifications?id=${id}`, {
-    method: 'DELETE',
-  })
+const deleteNotification = async (id: string): Promise<boolean> => {
+  try {
+    const baseUrl = getBaseUrl()
+    const response = await fetch(`${baseUrl}/api/notifications?id=${id}`, {
+      method: 'DELETE',
+    })
 
-  if (!response.ok) {
-    throw new Error('Failed to delete notification')
+    const responseData = await response.json()
+
+    if (!response.ok) {
+      throw new Error(responseData.error || 'Failed to delete notification')
+    }
+
+    return true
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : 'Failed to delete notification')
   }
-
-  // Revalidate the notifications cache
-  await revalidateTag('notifications')
 }
 
 /**
@@ -160,13 +165,13 @@ const updateNotification = async (
       body: JSON.stringify(data),
     })
 
+    const responseData = await response.json()
+
     if (!response.ok) {
-      throw new Error('Failed to update notification')
+      throw new Error(responseData.error || 'Failed to update notification')
     }
 
-    // Revalidate the notifications cache
-    await revalidateTag('notifications')
-    return response.json()
+    return responseData
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to update notification')
   }
