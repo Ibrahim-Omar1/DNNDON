@@ -8,7 +8,6 @@ import { NextRequest, NextResponse } from 'next/server'
 let connectionPromise: Promise<typeof mongoose> | null = null
 
 export const dynamic = 'force-dynamic' // defaults to auto
-export const revalidate = 60 // revalidate the data at most every 60 seconds
 
 /**
  * GET handler for notifications with optimized pagination
@@ -67,7 +66,7 @@ export async function GET(req: NextRequest) {
     // Return response with proper cache headers
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+        'Cache-Control': 'no-store',
       },
     })
   } catch (error) {

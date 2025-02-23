@@ -66,7 +66,7 @@ const getNotifications = async (
     const baseUrl = getBaseUrl()
     const response = await fetch(`${baseUrl}/api/notifications?${searchParams.toString()}`, {
       next: {
-        revalidate: 60,
+        revalidate: 0,
         tags: ['notifications'],
       },
     })
@@ -130,9 +130,7 @@ const deleteNotification = async (id: string): Promise<boolean> => {
     const response = await fetch(`${baseUrl}/api/notifications?id=${id}`, {
       method: 'DELETE',
     })
-
     const responseData = await response.json()
-
     if (!response.ok) {
       throw new Error(responseData.error || 'Failed to delete notification')
     }
@@ -178,3 +176,4 @@ const updateNotification = async (
 }
 
 export { addNotification, deleteNotification, getNotifications, updateNotification }
+
