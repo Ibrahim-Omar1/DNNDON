@@ -1,4 +1,5 @@
 import { type Notification } from '@/types/notifications.types'
+import { revalidateTag } from 'next/cache'
 
 /**
  * Response type for notifications API
@@ -24,6 +25,15 @@ export interface FetchNotificationsParams {
   limit?: number
   sort?: string
   order?: 'asc' | 'desc'
+}
+
+/**
+ * Get the base URL for API requests
+ */
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') return '' // browser should use relative url
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // SSR should use vercel url
+  return `http://localhost:${process.env.PORT ?? 3000}` // dev SSR should use localhost
 }
 
 /**
@@ -53,8 +63,12 @@ const getNotifications = async (
   if (params.limit) searchParams.append('limit', params.limit.toString())
 
   try {
-    const response = await fetch(`/api/notifications?${searchParams.toString()}`, {
-      cache: 'no-store',
+    const baseUrl = getBaseUrl()
+    const response = await fetch(`${baseUrl}/api/notifications?${searchParams.toString()}`, {
+      next: {
+        revalidate: 60,
+        tags: ['notifications'],
+      },
     })
 
     if (!response.ok) {
@@ -82,7 +96,8 @@ export const notificationsQueryKey = (params: FetchNotificationsParams = {}) =>
  */
 const addNotification = async (data: Partial<Notification>): Promise<Notification> => {
   try {
-    const response = await fetch('/api/notifications', {
+    const baseUrl = getBaseUrl()
+    const response = await fetch(`${baseUrl}/api/notifications`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -94,6 +109,8 @@ const addNotification = async (data: Partial<Notification>): Promise<Notificatio
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    // Revalidate the notifications cache
+    await revalidateTag('notifications')
     return response.json()
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to add notification')
@@ -107,13 +124,22 @@ const addNotification = async (data: Partial<Notification>): Promise<Notificatio
  * @returns Promise that resolves when the notification is deleted.
  * @throws Error if the API request fails.
  */
-const deleteNotification = async (id: string): Promise<void> => {
-  const response = await fetch(`/api/notifications?id=${id}`, {
-    method: 'DELETE',
-  })
+const deleteNotification = async (id: string): Promise<boolean> => {
+  try {
+    const baseUrl = getBaseUrl()
+    const response = await fetch(`${baseUrl}/api/notifications?id=${id}`, {
+      method: 'DELETE',
+    })
 
-  if (!response.ok) {
-    throw new Error('Failed to delete notification')
+    const responseData = await response.json()
+
+    if (!response.ok) {
+      throw new Error(responseData.error || 'Failed to delete notification')
+    }
+
+    return true
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : 'Failed to delete notification')
   }
 }
 
@@ -130,7 +156,8 @@ const updateNotification = async (
   data: Partial<Notification>
 ): Promise<Notification> => {
   try {
-    const response = await fetch(`/api/notifications?id=${id}`, {
+    const baseUrl = getBaseUrl()
+    const response = await fetch(`${baseUrl}/api/notifications?id=${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -138,11 +165,13 @@ const updateNotification = async (
       body: JSON.stringify(data),
     })
 
+    const responseData = await response.json()
+
     if (!response.ok) {
-      throw new Error('Failed to update notification')
+      throw new Error(responseData.error || 'Failed to update notification')
     }
 
-    return response.json()
+    return responseData
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to update notification')
   }

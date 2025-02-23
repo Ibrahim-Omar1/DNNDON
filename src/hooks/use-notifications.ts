@@ -1,3 +1,4 @@
+import { revalidateNotifications } from '@/app/actions'
 import {
   addNotification,
   deleteNotification,
@@ -6,7 +7,13 @@ import {
   NotificationsResponse,
   updateNotification,
 } from '@/services/notifications'
-import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 /**
@@ -107,6 +114,10 @@ const useAddNotification = () => {
     mutationFn: addNotification,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      toast.success('Notification added successfully')
+    },
+    onError: () => {
+      toast.error('Failed to add notification')
     },
   })
 }
@@ -135,13 +146,22 @@ const useDeleteNotification = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: deleteNotification,
-    onSuccess: () => {
+    mutationFn: async (id: string) => {
+      const response = await deleteNotification(id)
+      if (!response) {
+        throw new Error('Failed to delete notification')
+      }
+      return response
+    },
+    onSuccess: async () => {
+      // Revalidate server-side cache
+      await revalidateNotifications()
+      // Invalidate client-side cache
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success('Notification deleted successfully')
     },
-    onError: () => {
-      toast.error('Failed to delete notification')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to delete notification')
     },
   })
 }
@@ -176,14 +196,44 @@ const useUpdateNotification = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => updateNotification(id, data),
-    onSuccess: () => {
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const response = await updateNotification(id, data)
+      if (!response) {
+        throw new Error('Failed to update notification')
+      }
+      return response
+    },
+    onSuccess: async () => {
+      // Revalidate server-side cache
+      await revalidateNotifications()
+      // Invalidate client-side cache
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success('Notification updated successfully')
     },
-    onError: () => {
-      toast.error('Failed to update notification')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to update notification')
     },
+  })
+}
+
+/**
+ * Custom hook for fetching notifications with Suspense
+ *
+ * Uses TanStack Query's useSuspenseQuery for data fetching with Suspense integration.
+ * Data is guaranteed to be available when component renders.
+ */
+const useSuspenseNotifications = (params: {
+  page?: number
+  limit?: number
+  initialData?: NotificationsResponse
+  initialDataUpdatedAt?: number
+}) => {
+  return useSuspenseQuery({
+    queryKey: notificationsQueryKey(params),
+    queryFn: () => getNotifications(params),
+    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    initialData: params.initialData,
+    initialDataUpdatedAt: params.initialDataUpdatedAt,
   })
 }
 
@@ -192,5 +242,6 @@ export {
   useDeleteNotification,
   useGetCachedNotifications,
   useNotifications,
+  useSuspenseNotifications,
   useUpdateNotification,
 }

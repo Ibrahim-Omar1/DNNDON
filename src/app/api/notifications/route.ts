@@ -7,6 +7,9 @@ import { NextRequest, NextResponse } from 'next/server'
 // Cache connection promise
 let connectionPromise: Promise<typeof mongoose> | null = null
 
+export const dynamic = 'force-dynamic' // defaults to auto
+export const revalidate = 60 // revalidate the data at most every 60 seconds
+
 /**
  * GET handler for notifications with optimized pagination
  *
@@ -26,8 +29,8 @@ export async function GET(req: NextRequest) {
     await connectionPromise
 
     const searchParams = req.nextUrl.searchParams
-    const page = Number(searchParams.get('page') ?? '1')
-    const limit = Number(searchParams.get('limit') ?? '10')
+    const page = Number(searchParams.get('page')) || 1
+    const limit = Number(searchParams.get('limit')) || 10
     const skip = (page - 1) * limit
 
     // Execute queries in parallel
@@ -61,16 +64,23 @@ export async function GET(req: NextRequest) {
       },
     }
 
-    // Cache headers for better client-side caching
-    return new NextResponse(JSON.stringify(response), {
+    // Return response with proper cache headers
+    return NextResponse.json(response, {
       headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=59',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
       },
     })
   } catch (error) {
     console.error('Error in notifications API:', error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store',
+        },
+      }
+    )
   }
 }
 
