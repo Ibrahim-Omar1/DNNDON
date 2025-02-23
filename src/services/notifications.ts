@@ -53,7 +53,9 @@ const getNotifications = async (
   if (params.limit) searchParams.append('limit', params.limit.toString())
 
   try {
-    const response = await fetch(`/api/notifications?${searchParams.toString()}`)
+    const response = await fetch(`/api/notifications?${searchParams.toString()}`, {
+      cache: 'no-store',
+    })
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)

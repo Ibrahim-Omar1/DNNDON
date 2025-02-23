@@ -10,10 +10,11 @@ import {
 import { type Notification } from '@/types/notifications.types'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ColumnHeaderOptions from '../ui/data-table/ColumnHeaderOptions'
 import { DeleteNotificationDialog } from './delete-notification-dialog'
 import { EditNotificationModal } from './edit-notification-modal'
+import { useNotifications } from '@/hooks/use-notifications'
 
 export const columns: ColumnDef<Notification>[] = [
   {
@@ -85,7 +86,18 @@ function StatusCell({ row }: { row: Row<Notification> }) {
 function ActionsCell({ row }: { row: Row<Notification> }) {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const notification = row.original
+  const [currentNotification, setCurrentNotification] = useState(row.original)
+
+  // Update the current notification when the row data changes
+  useEffect(() => {
+    setCurrentNotification(row.original)
+  }, [row.original])
+
+  const handleEditClick = () => {
+    // Refresh the current notification data before showing the modal
+    setCurrentNotification(row.original)
+    setShowEditModal(true)
+  }
 
   return (
     <>
@@ -97,7 +109,7 @@ function ActionsCell({ row }: { row: Row<Notification> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setShowEditModal(true)}>
+          <DropdownMenuItem onClick={handleEditClick}>
             <Pencil className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
@@ -111,14 +123,16 @@ function ActionsCell({ row }: { row: Row<Notification> }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditNotificationModal
-        notification={notification}
-        open={showEditModal}
-        onOpenChange={setShowEditModal}
-      />
+      {showEditModal && (
+        <EditNotificationModal
+          notification={currentNotification}
+          open={showEditModal}
+          onOpenChange={setShowEditModal}
+        />
+      )}
 
       <DeleteNotificationDialog
-        notificationId={notification.id}
+        notificationId={currentNotification.id}
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
       />
