@@ -24,7 +24,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 const notificationSchema = z.object({
-  type: z.enum(['Photo', 'Text']),
+  type: z.string().min(1),
   space: z.string().min(1),
   country: z.string().min(1),
   city: z.string().min(1),
@@ -45,8 +45,8 @@ export function AddNotificationModal({ open, onOpenChange }: AddNotificationModa
   const form = useForm<NotificationFormData>({
     resolver: zodResolver(notificationSchema),
     defaultValues: {
-      type: 'Photo',
-      space: '230 X 500 PX',
+      type: '',
+      space: '',
       country: '',
       city: '',
     },
