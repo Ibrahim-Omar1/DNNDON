@@ -1,5 +1,4 @@
 import { type Notification } from '@/types/notifications.types'
-import { revalidateTag } from 'next/cache'
 
 /**
  * Response type for notifications API
@@ -109,8 +108,6 @@ const addNotification = async (data: Partial<Notification>): Promise<Notificatio
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    // Revalidate the notifications cache
-    await revalidateTag('notifications')
     return response.json()
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to add notification')
@@ -176,4 +173,3 @@ const updateNotification = async (
 }
 
 export { addNotification, deleteNotification, getNotifications, updateNotification }
-
