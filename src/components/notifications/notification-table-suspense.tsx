@@ -23,7 +23,6 @@ export function NotificationTableSuspense({
   initialData,
 }: NotificationTableSuspenseProps) {
   const [addModalOpen, setAddModalOpen] = useState(false)
-  const queryClient = useQueryClient()
 
   const { data, refetch, isFetching } = useSuspenseNotifications({
     page: initialPage,

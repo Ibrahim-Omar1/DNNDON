@@ -66,8 +66,8 @@ const getNotifications = async (
     const baseUrl = getBaseUrl()
     const response = await fetch(`${baseUrl}/api/notifications?${searchParams.toString()}`, {
       next: {
-        tags: ['notifications'], // Add cache tag
-        revalidate: 60, // Cache for 60 seconds
+        revalidate: 60,
+        tags: ['notifications'],
       },
     })
 
