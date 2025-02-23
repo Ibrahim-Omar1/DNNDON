@@ -203,7 +203,7 @@ const useUpdateNotification = () => {
       }
       return response
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       // Revalidate server-side cache
       await revalidateNotifications()
       // Invalidate client-side cache

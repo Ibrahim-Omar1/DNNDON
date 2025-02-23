@@ -10,11 +10,10 @@ import {
 import { type Notification } from '@/types/notifications.types'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ColumnHeaderOptions from '../ui/data-table/ColumnHeaderOptions'
 import { DeleteNotificationDialog } from './delete-notification-dialog'
 import { EditNotificationModal } from './edit-notification-modal'
-import { useNotifications } from '@/hooks/use-notifications'
 
 export const columns: ColumnDef<Notification>[] = [
   {
