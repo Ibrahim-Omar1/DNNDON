@@ -55,7 +55,7 @@ const useNotifications = (params: {
     queryFn: () => getNotifications(params),
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     refetchOnWindowFocus: false,
-    placeholderData: (prev) => prev, // Add this to keep previous data while loading new data
+    // placeholderData: (prev) => prev, // Add this to keep previous data while loading new data
   })
 }
 
@@ -112,8 +112,14 @@ const useAddNotification = () => {
 
   return useMutation({
     mutationFn: addNotification,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+    onSuccess: async () => {
+      // Invalidate and refetch all notification queries
+      await queryClient.invalidateQueries({
+        queryKey: ['notifications'],
+        refetchType: 'all'
+      })
+      // Revalidate server cache
+      await revalidateNotifications()
       toast.success('Notification added successfully')
     },
     onError: () => {
@@ -154,10 +160,13 @@ const useDeleteNotification = () => {
       return response
     },
     onSuccess: async () => {
-      // Revalidate server-side cache
+      // Invalidate and refetch all notification queries
+      await queryClient.invalidateQueries({
+        queryKey: ['notifications'],
+        refetchType: 'all'
+      })
+      // Revalidate server cache
       await revalidateNotifications()
-      // Invalidate client-side cache
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success('Notification deleted successfully')
     },
     onError: (error: Error) => {
@@ -204,10 +213,13 @@ const useUpdateNotification = () => {
       return response
     },
     onSuccess: async () => {
-      // Revalidate server-side cache
+      // Invalidate and refetch all notification queries
+      await queryClient.invalidateQueries({
+        queryKey: ['notifications'],
+        refetchType: 'all'
+      })
+      // Revalidate server cache
       await revalidateNotifications()
-      // Invalidate client-side cache
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success('Notification updated successfully')
     },
     onError: (error: Error) => {
@@ -231,7 +243,9 @@ const useSuspenseNotifications = (params: {
   return useSuspenseQuery({
     queryKey: notificationsQueryKey(params),
     queryFn: () => getNotifications(params),
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    staleTime: 0, // Always fetch new data
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
     initialData: params.initialData,
     initialDataUpdatedAt: params.initialDataUpdatedAt,
   })

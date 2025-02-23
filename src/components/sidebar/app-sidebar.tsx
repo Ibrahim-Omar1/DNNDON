@@ -28,12 +28,12 @@ const navigationItems: NavItem[] = [
     icon: Bell,
     // isActive: false,
   },
-  {
-    title: 'Notifications ( SSR )',
-    url: '/notifications/ssr',
-    icon: Bell,
-    // isActive: false,
-  },
+  // {
+  //   title: 'Notifications ( SSR )',
+  //   url: '/notifications/ssr',
+  //   icon: Bell,
+  //   // isActive: false,
+  // },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
