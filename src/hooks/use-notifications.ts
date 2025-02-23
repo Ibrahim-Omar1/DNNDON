@@ -6,7 +6,13 @@ import {
   NotificationsResponse,
   updateNotification,
 } from '@/services/notifications'
-import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 /**
@@ -107,6 +113,10 @@ const useAddNotification = () => {
     mutationFn: addNotification,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      toast.success('Notification added successfully')
+    },
+    onError: () => {
+      toast.error('Failed to add notification')
     },
   })
 }
@@ -187,10 +197,32 @@ const useUpdateNotification = () => {
   })
 }
 
+/**
+ * Custom hook for fetching notifications with Suspense
+ *
+ * Uses TanStack Query's useSuspenseQuery for data fetching with Suspense integration.
+ * Data is guaranteed to be available when component renders.
+ */
+const useSuspenseNotifications = (params: {
+  page?: number
+  limit?: number
+  initialData?: NotificationsResponse
+  initialDataUpdatedAt?: number
+}) => {
+  return useSuspenseQuery({
+    queryKey: notificationsQueryKey(params),
+    queryFn: () => getNotifications(params),
+    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    initialData: params.initialData,
+    initialDataUpdatedAt: params.initialDataUpdatedAt,
+  })
+}
+
 export {
   useAddNotification,
   useDeleteNotification,
   useGetCachedNotifications,
   useNotifications,
+  useSuspenseNotifications,
   useUpdateNotification,
 }

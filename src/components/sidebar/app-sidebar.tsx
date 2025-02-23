@@ -23,8 +23,14 @@ const navigationItems: NavItem[] = [
     isActive: true,
   },
   {
-    title: 'Notifications',
+    title: 'Notifications ( CSR )',
     url: '/notifications',
+    icon: Bell,
+    // isActive: false,
+  },
+  {
+    title: 'Notifications ( SSR )',
+    url: '/notifications/ssr',
     icon: Bell,
     // isActive: false,
   },
