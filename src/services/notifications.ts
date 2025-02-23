@@ -1,4 +1,5 @@
 import { type Notification } from '@/types/notifications.types'
+import { revalidateTag } from 'next/cache'
 
 /**
  * Response type for notifications API
@@ -108,6 +109,8 @@ const addNotification = async (data: Partial<Notification>): Promise<Notificatio
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
+    // Revalidate the notifications cache
+    await revalidateTag('notifications')
     return response.json()
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to add notification')
@@ -127,9 +130,7 @@ const deleteNotification = async (id: string): Promise<boolean> => {
     const response = await fetch(`${baseUrl}/api/notifications?id=${id}`, {
       method: 'DELETE',
     })
-
     const responseData = await response.json()
-
     if (!response.ok) {
       throw new Error(responseData.error || 'Failed to delete notification')
     }
