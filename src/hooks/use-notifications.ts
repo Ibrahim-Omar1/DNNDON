@@ -121,8 +121,8 @@ const useAddNotification = () => {
       })
       toast.success('Notification added successfully')
     },
-    onError: () => {
-      toast.error('Failed to add notification')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to add notification')
     },
   })
 }
